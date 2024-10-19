@@ -1,19 +1,14 @@
 import { EventEmitter } from "events";
 import dispatcher from "../dispatcher/Dispatcher";
 import { ACTION_TYPE } from "../constants/AppConstants";
-
-/**
- * Authentication store
- */
 class AuthStore extends EventEmitter {
   constructor() {
     super();
-    this.isLoading = false; /* Whether the user is logging in */
-    this.isLogedIn = false; /* Whether the user is already logged in */
-    this.showError = false; /* Whether we should show an error message in the login */
+    this.isLoading = false;
+    this.isLogedIn = false;
+    this.showError = false;
   }
 
-  /* Store event emmitter method */
   emitChange() {
     this.emit("change");
   }
@@ -26,7 +21,6 @@ class AuthStore extends EventEmitter {
     this.removeListener("change", callback);
   }
 
-  /* Store action handler method */
   handleAction(action) {
     switch (action.type) {
       case ACTION_TYPE.LOGIN:
@@ -42,20 +36,17 @@ class AuthStore extends EventEmitter {
     }
   }
 
-  /* Method for handling login action */
   handleLogin() {
     this.isLoading = true;
     this.emitChange();
   }
 
-  /* Method for handling login succeed action */
   handleLoginSucceeded() {
     this.isLoading = this.showError = false;
     this.isLogedIn = true;
     this.emitChange();
   }
 
-  /* Method for handling login failed action */
   handleLoginFailed() {
     this.isLoading = this.isLogedIn = false;
     this.showError = true;

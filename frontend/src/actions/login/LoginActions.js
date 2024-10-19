@@ -8,6 +8,6 @@ export const LoginSuccededAction = {
   type: ACTION_TYPE.LOGIN_SUCCEEDED,
 };
 
-export const LoginFaileddAction = {
+export const LoginFailedAction = {
   type: ACTION_TYPE.LOGIN_FAILED,
 };
