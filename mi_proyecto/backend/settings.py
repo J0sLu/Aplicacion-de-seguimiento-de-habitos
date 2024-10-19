@@ -126,3 +126,18 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',  # Motor de PostgreSQL
+        'NAME': 'neondb',        # Nombre de la base de datos en Neon
+        'USER': 'neondb_owner',                        # Usuario proporcionado por Neon
+        'PASSWORD': 'NeL1Ck7sYfQh',                 # Contraseña proporcionada por Neon
+        'HOST': 'ep-falling-grass-a5csmto2.us-east-2.aws.neon.tech',                      # Host (generalmente proporcionado por Neon)
+        'PORT': '5432',                              # Puerto estándar para PostgreSQL, podría variar
+        'OPTIONS': {
+            'sslmode': 'require',                    # Es probable que Neon requiera conexiones SSL
+        },
+    }
+}
+
