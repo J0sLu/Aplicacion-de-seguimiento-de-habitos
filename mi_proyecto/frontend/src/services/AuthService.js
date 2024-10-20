@@ -1,18 +1,26 @@
 class AuthService {
-  login(username, password) {
+  async login(username, password) {
     try {
-      return this.checkCredentials(username, password);
-    } catch (e) {
-      console.log("Algo salio mal con el login");
-    }
-  }
+      const response = await fetch("http://localhost:8000/api/login/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          username: username,
+          password: password,
+        }),
+      });
 
-  checkCredentials(username, password) {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        resolve(username === "admin@gmail.com" && password === "123");
-      }, 1000);
-    });
+      if (!response.ok) {
+        throw new Error("Credenciales incorrectas o error en el servidor");
+      }
+
+      const data = await response.json();
+      return data.exists;
+    } catch (e) {
+      return false;
+    }
   }
 }
 

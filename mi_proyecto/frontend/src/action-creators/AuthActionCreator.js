@@ -9,12 +9,8 @@ import authService from "../services/AuthService";
 class AuthActionCreator {
   async login(username, password) {
     dispatcher.dispatch(LoginAction);
-    try {
-      const isLogedIn = await authService.login(username, password);
-      dispatcher.dispatch(isLogedIn ? LoginSuccededAction : LoginFailedAction);
-    } catch (e) {
-      dispatcher.dispatch(LoginFailedAction);
-    }
+    const isLogedIn = await authService.login(username, password);
+    dispatcher.dispatch(isLogedIn ? LoginSuccededAction : LoginFailedAction);
   }
 }
 
