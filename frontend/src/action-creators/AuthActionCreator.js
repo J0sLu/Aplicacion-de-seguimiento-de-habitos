@@ -4,12 +4,14 @@ import {
   LoginFailedAction,
 } from "../actions/login/LoginActions";
 import dispatcher from "../dispatcher/Dispatcher";
+import authService from "../services/AuthService";
 
 class AuthActionCreator {
-  login() {
+  async login(username, password) {
     dispatcher.dispatch(LoginAction);
     try {
-      dispatcher.dispatch(LoginSuccededAction);
+      const isLogedIn = await authService.login(username, password);
+      dispatcher.dispatch(isLogedIn ? LoginSuccededAction : LoginFailedAction);
     } catch (e) {
       dispatcher.dispatch(LoginFailedAction);
     }
