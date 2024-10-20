@@ -1,13 +1,15 @@
 class AuthService {
   async login(username, password) {
     try {
+      console.log(username);
+      console.log(password);
       const response = await fetch("http://localhost:8000/api/login/", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          username: username,
+          email: username,
           password: password,
         }),
       });
@@ -17,6 +19,7 @@ class AuthService {
       }
 
       const data = await response.json();
+      console.log(data);
       return data.exists;
     } catch (e) {
       return false;
