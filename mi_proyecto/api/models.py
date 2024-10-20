@@ -1,6 +1,5 @@
 from django.db import models
-from django.contrib.auth.hashers import make_password
-
+from django.contrib.auth.hashers import make_password, check_password
 class User(models.Model):
     id = models.BigAutoField(primary_key=True)
     username = models.TextField()
@@ -16,6 +15,14 @@ class User(models.Model):
 
     def __str__(self):
         return self.username
+    
+    def check_password(self, raw_password):
+        # Verifica la contraseña proporcionada con el hash almacenado
+        
+        #raw_password = make_password(raw_password)
+        
+        #return raw_password == self.password
+        return check_password(raw_password, make_password(self.password))
 
 class Habit(models.Model):
     FREQUENCY_CHOICES = [
