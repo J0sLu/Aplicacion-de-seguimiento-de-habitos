@@ -5,12 +5,27 @@ from rest_framework import status
 from .models import User, Habit, Progress, Notification, Reward
 from .serializers import UserSerializer, HabitSerializer, ProgressSerializer, NotificationSerializer, RewardSerializer
 from django.contrib.auth.hashers import make_password
-
+from rest_framework.decorators import api_view
 """ 
 @api_view(['GET'])
 def example_view(request):
     data = {"message": "Hello from Django!"}
     return Response(data) """
+
+
+class VerifyUserView(APIView):
+    def post(self, request):
+        email = request.data.get('email')
+        password = request.data.get('password')
+        
+        try:
+            user = User.objects.get(email=email)
+            if user.check_password(password):  # Verifica la contraseña
+                return Response({"exists": True}, status=status.HTTP_200_OK)
+            else:
+                return Response({"exists": False}, status=status.HTTP_200_OK)
+        except User.DoesNotExist:
+            return Response({"exists": False}, status=status.HTTP_200_OK)
 
 # Vistas para el modelo User
 class UserViewSet(viewsets.ModelViewSet):
@@ -51,3 +66,5 @@ class NotificationViewSet(viewsets.ModelViewSet):
 class RewardViewSet(viewsets.ModelViewSet):
     queryset = Reward.objects.all()
     serializer_class = RewardSerializer
+
+
