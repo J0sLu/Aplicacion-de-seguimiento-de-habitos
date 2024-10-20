@@ -1,6 +1,3 @@
-from django.urls import path
-from .views import example_view
-
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from .views import UserViewSet, HabitViewSet, ProgressViewSet, NotificationViewSet, RewardViewSet
@@ -13,5 +10,5 @@ router.register(r'notifications', NotificationViewSet)
 router.register(r'rewards', RewardViewSet)
 
 urlpatterns = [
-    path('', include(router.urls)),
+    path('api/', include(router.urls)),
 ]
