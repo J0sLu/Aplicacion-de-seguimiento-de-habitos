@@ -31,7 +31,9 @@ class Habit(models.Model):
         ('monthly', 'Monthly'),
     ]
 
-    id = models.BigAutoField(primary_key=True)
+    
+
+    id = models.AutoField(primary_key=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='habits')
     name = models.TextField()
     start_date = models.DateField()
@@ -41,6 +43,10 @@ class Habit(models.Model):
 
     def __str__(self):
         return self.name
+    
+    def save(self, *args, **kwargs):
+ 
+        super(Habit, self).save(*args, **kwargs)
 
 
 class Progress(models.Model):

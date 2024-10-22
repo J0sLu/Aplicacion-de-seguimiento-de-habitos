@@ -1,6 +1,6 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from .views import UserViewSet, HabitViewSet, ProgressViewSet, NotificationViewSet, RewardViewSet,VerifyUserView
+from .views import *
 
 router = DefaultRouter()
 router.register(r'users', UserViewSet)
@@ -12,4 +12,8 @@ router.register(r'rewards', RewardViewSet)
 urlpatterns = [
     path('api/', include(router.urls)),
     path('api/login/', VerifyUserView.as_view()),  # Cambia a esta línea
+    path('api/singup/', UserCreateView.as_view()),  # Cambia a esta línea
+    path('api/create_habit/', HabitCreateView.as_view()),  # Cambia a esta línea
+    path('api/habits_user/', HabitUserID.as_view()),  # Cambia a esta línea
+    path('api/notify_user/', NotifyUserID.as_view()),  # Cambia a esta línea
 ]
