@@ -1,3 +1,4 @@
+# api/views.py
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import viewsets
@@ -6,15 +7,23 @@ from .models import User, Habit, Progress, Notification, Reward
 from .serializers import UserSerializer, HabitSerializer, ProgressSerializer, NotificationSerializer, RewardSerializer
 from django.contrib.auth.hashers import make_password
 from rest_framework.decorators import api_view
+from django.http import HttpResponse
+from django.shortcuts import redirect  # Para redirigir en la vista home_view
 from django.utils import timezone  # Importar la zona horaria de Django
 from datetime import timedelta  # Importar timedelta para sumar o restar días a una fecha
 """ 
 @api_view(['GET'])
 def example_view(request):
     data = {"message": "Hello from Django!"}
-    return Response(data) """
+    return Response(data)
+"""
 
+def home_view(request):
+    """ Muestra un mensaje de bienvenida"""
+    # Puedes devolver un mensaje simple
+    return HttpResponse("<h1>Bienvenido a la API de Gestión de Hábitos</h1>")
 
+# Vista de verificación de usuarios
 class VerifyUserView(APIView):
     def post(self, request):
         email = request.data.get('email')
@@ -123,5 +132,4 @@ class NotifyUserID(APIView):
 class RewardViewSet(viewsets.ModelViewSet):
     queryset = Reward.objects.all()
     serializer_class = RewardSerializer
-
 
