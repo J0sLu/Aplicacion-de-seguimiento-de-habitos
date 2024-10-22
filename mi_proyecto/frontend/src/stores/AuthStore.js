@@ -1,6 +1,7 @@
 import { EventEmitter } from "events";
 import dispatcher from "../dispatcher/Dispatcher";
 import { ACTION_TYPE } from "../constants/AppConstants";
+
 class AuthStore extends EventEmitter {
   constructor() {
     super();
@@ -32,6 +33,9 @@ class AuthStore extends EventEmitter {
       case ACTION_TYPE.LOGIN_FAILED:
         this.handleLoginFailed();
         break;
+      case ACTION_TYPE.LOGOUT: // Nuevo caso de LOGOUT
+        this.handleLogout();
+        break;
       default:
     }
   }
@@ -53,6 +57,11 @@ class AuthStore extends EventEmitter {
     this.emitChange();
   }
 
+  handleLogout() { // Nueva función para manejar el logout
+    this.isLogedIn = false;
+    this.emitChange();
+  }
+
   getIsLoading() {
     return this.isLoading;
   }
@@ -70,3 +79,4 @@ const authStore = new AuthStore();
 dispatcher.register(authStore.handleAction.bind(authStore));
 
 export default authStore;
+

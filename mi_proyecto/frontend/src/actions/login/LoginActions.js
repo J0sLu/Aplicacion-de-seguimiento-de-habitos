@@ -11,3 +11,8 @@ export const LoginSuccededAction = {
 export const LoginFailedAction = {
   type: ACTION_TYPE.LOGIN_FAILED,
 };
+
+export const LogoutAction = { // Nueva acción para logout
+  type: ACTION_TYPE.LOGOUT,
+};
+
