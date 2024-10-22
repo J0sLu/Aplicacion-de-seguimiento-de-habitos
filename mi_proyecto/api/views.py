@@ -6,7 +6,6 @@ from rest_framework import status
 from .models import User, Habit, Progress, Notification, Reward
 from .serializers import UserSerializer, HabitSerializer, ProgressSerializer, NotificationSerializer, RewardSerializer
 from django.contrib.auth.hashers import make_password
-from rest_framework.decorators import api_view
 from django.http import HttpResponse
 from django.shortcuts import redirect  # Para redirigir en la vista home_view
 from django.utils import timezone  # Importar la zona horaria de Django
@@ -19,10 +18,12 @@ def example_view(request):
     return Response(data)
 """
 
-def home_view(request):
-    """ Muestra un mensaje de bienvenida"""
-    # Puedes devolver un mensaje simple
-    return HttpResponse("<h1>Bienvenido a la API de Gestión de Hábitos</h1>")
+class Home_view(APIView):
+    def get(self, request):
+        """ Muestra un mensaje de bienvenida"""
+        return Response("<h1>Bienvenido a la API de Gestión de Hábitos</h1>")
+    
+  
 
 # Vista de verificación de usuarios
 class VerifyUserView(APIView):
@@ -121,6 +122,27 @@ class NotifyUserID(APIView):
         # Filtrar notificaciones por user_id y por sent_at <= current_time
         notifications = Notification.objects.filter(user_id=user_id, sent_at__lte=current_time)
 
+        # Verificar si existen notificaciones
+        if not notifications.exists():
+            return Response({"message": "No notifications found for this user"}, status=status.HTTP_404_NOT_FOUND)
+        
+        # Serializar las notificaciones
+        serializer = NotificationSerializer(notifications, many=True)
+        
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class NotifyUserIDAll(APIView):
+    def get(self, request):
+        
+        user_id = request.query_params.get('user_id')
+
+        if not user_id:
+            return Response({"error": "user_id is required"}, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Filtrar notificaciones por user_id y por sent_at <= current_time
+        notifications = Notification.objects.filter(user_id=user_id)
+        
         # Verificar si existen notificaciones
         if not notifications.exists():
             return Response({"message": "No notifications found for this user"}, status=status.HTTP_404_NOT_FOUND)
