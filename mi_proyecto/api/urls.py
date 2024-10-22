@@ -17,11 +17,12 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include(router.urls)),
     path('api/login/', VerifyUserView.as_view()),
-    path('', home_view, name='home'),  # Ruta para la página principal
+    path('', Home_view.as_view(), name='home'),  # Ruta para la página principal
     path('api/login/', VerifyUserView.as_view()),  # Cambia a esta línea
     path('api/singup/', UserCreateView.as_view()),  # Cambia a esta línea
     path('api/create_habit/', HabitCreateView.as_view()),  # Cambia a esta línea
     path('api/habits_user/', HabitUserID.as_view()),  # Cambia a esta línea
     path('api/notify_user/', NotifyUserID.as_view()),  # Cambia a esta línea
+    path('api/notify_all/', NotifyUserIDAll.as_view()),  # Cambia a esta línea
 ]
 
