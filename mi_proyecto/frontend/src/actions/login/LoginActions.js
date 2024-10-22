@@ -12,7 +12,19 @@ export const LoginFailedAction = {
   type: ACTION_TYPE.LOGIN_FAILED,
 };
 
-export const LogoutAction = { // Nueva acción para logout
-  type: ACTION_TYPE.LOGOUT,
+export const SignupAction = {
+  type: ACTION_TYPE.SIGNUP,
 };
 
+export const SignupSuccededAction = {
+  type: ACTION_TYPE.SIGNUP_SUCCEEDED,
+};
+
+export const SignupFailedAction = {
+  type: ACTION_TYPE.SIGNUP_FAILED,
+};
+
+export const LogoutAction = {
+  // Nueva acción para logout
+  type: ACTION_TYPE.LOGOUT,
+};

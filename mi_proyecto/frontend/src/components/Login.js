@@ -7,11 +7,12 @@ import Spinner from "react-bootstrap/Spinner";
 import Alert from "react-bootstrap/Alert";
 
 const Login = (props) => {
-  const { onLogin, authStore } = props;
+  const { onLogin, onSignup, authStore } = props;
   const [isLoggedIn, setIsLoggedIn] = useState(authStore.getIsLoggedIn());
   const [isLoading, setIsLoading] = useState(authStore.getIsLoading());
   const [showError, setShowError] = useState(authStore.getShowError());
   const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoggingIn, setIsLoggingIn] = useState(true);
 
@@ -30,7 +31,11 @@ const Login = (props) => {
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    onLogin(username, password);
+    if (isLoggingIn) {
+      onLogin(email, password);
+    } else {
+      onSignup(username, email, password);
+    }
   };
 
   return isLoggedIn ? (
@@ -44,6 +49,9 @@ const Login = (props) => {
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
+        padding: "0",
+        boxSizing: "border-box",
+        fontFamily: "Roboto Mono, monospace",
       }}
     >
       <Form
@@ -64,7 +72,9 @@ const Login = (props) => {
         </h1>
         {showError && (
           <Alert variant="danger" style={{ width: "100%" }}>
-            Error: Credenciales incorrectas, intenta de nuevo.
+            {isLoggingIn
+              ? "Error: Credenciales incorrectas, intenta de nuevo."
+              : "Error: Algo salio mal, intenta de nuevo"}
           </Alert>
         )}
 
@@ -79,6 +89,7 @@ const Login = (props) => {
                   borderColor: "#B7B7B7",
                 }}
                 placeholder="Ingresa tu nombre de usuario"
+                onChange={(e) => setUsername(e.target.value)}
               />
             </Form.Group>
           </Container>
@@ -93,7 +104,7 @@ const Login = (props) => {
               style={{
                 borderColor: "#B7B7B7",
               }}
-              onChange={(e) => setUsername(e.target.value)}
+              onChange={(e) => setEmail(e.target.value)}
             />
           </Form.Group>
           <Form.Group className="mb-3">

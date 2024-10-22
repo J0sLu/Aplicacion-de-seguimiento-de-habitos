@@ -12,7 +12,11 @@ function App() {
         <Route
           path="/login"
           element={
-            <Login onLogin={authActionCreator.login} authStore={authStore} />
+            <Login
+              onLogin={authActionCreator.login}
+              onSignup={authActionCreator.signup}
+              authStore={authStore}
+            />
           }
         />
         <Route
@@ -37,4 +41,3 @@ function App() {
 }
 
 export default App;
-

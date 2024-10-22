@@ -2,6 +2,9 @@ import {
   LoginAction,
   LoginSuccededAction,
   LoginFailedAction,
+  SignupAction,
+  SignupSuccededAction,
+  SignupFailedAction,
   LogoutAction, // Importar acción de logout
 } from "../actions/login/LoginActions";
 import dispatcher from "../dispatcher/Dispatcher";
@@ -14,11 +17,17 @@ class AuthActionCreator {
     dispatcher.dispatch(isLogedIn ? LoginSuccededAction : LoginFailedAction);
   }
 
-  logout() { // Nueva función de logout
+  async signup(username, email, password) {
+    dispatcher.dispatch(SignupAction);
+    const isSaved = await authService.signup(username, email, password);
+    dispatcher.dispatch(isSaved ? SignupSuccededAction : SignupFailedAction);
+  }
+
+  logout() {
+    // Nueva función de logout
     dispatcher.dispatch(LogoutAction);
   }
 }
 
 const authActionCreator = new AuthActionCreator();
 export default authActionCreator;
-
