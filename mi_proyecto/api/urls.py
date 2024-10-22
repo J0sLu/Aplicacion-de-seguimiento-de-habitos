@@ -3,8 +3,8 @@ from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from django.contrib import admin  # Importa el módulo admin
 
-from api.views import UserViewSet, HabitViewSet, ProgressViewSet, NotificationViewSet, RewardViewSet, VerifyUserView, home_view
-from .views import *
+
+from api.views import *
 
 router = DefaultRouter()
 router.register(r'users', UserViewSet)

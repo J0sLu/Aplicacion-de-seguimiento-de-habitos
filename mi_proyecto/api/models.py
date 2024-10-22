@@ -18,12 +18,9 @@ class User(models.Model):
     
     def check_password(self, raw_password):
         # Verifica la contraseña proporcionada con el hash almacenado
-        
-        #raw_password = make_password(raw_password)
-        
-        #return raw_password == self.password
-        return check_password(raw_password, make_password(self.password))
-
+        return check_password(raw_password, self.password)
+    
+    
 class Habit(models.Model):
     FREQUENCY_CHOICES = [
         ('daily', 'Daily'),

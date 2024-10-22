@@ -11,6 +11,7 @@ from django.http import HttpResponse
 from django.shortcuts import redirect  # Para redirigir en la vista home_view
 from django.utils import timezone  # Importar la zona horaria de Django
 from datetime import timedelta  # Importar timedelta para sumar o restar días a una fecha
+
 """ 
 @api_view(['GET'])
 def example_view(request):
@@ -31,12 +32,13 @@ class VerifyUserView(APIView):
         
         try:
             user = User.objects.get(email=email)
+            
             if user.check_password(password):  # Verifica la contraseña
                 return Response({"exists": True}, status=status.HTTP_200_OK)
             else:
-                return Response({"exists": False}, status=status.HTTP_200_OK)
+                return Response({"exists 01": False}, status=status.HTTP_200_OK)
         except User.DoesNotExist:
-            return Response({"exists": False}, status=status.HTTP_200_OK)
+            return Response({"exists 02": False}, status=status.HTTP_200_OK)
 
 # Vistas para el modelo User
 class UserViewSet(viewsets.ModelViewSet):
