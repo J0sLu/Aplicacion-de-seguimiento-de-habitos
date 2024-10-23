@@ -7,12 +7,14 @@ import Spinner from "react-bootstrap/Spinner";
 import Alert from "react-bootstrap/Alert";
 
 const Login = (props) => {
-  const { onLogin, authStore } = props;
+  const { onLogin, onSignup, authStore } = props;
   const [isLoggedIn, setIsLoggedIn] = useState(authStore.getIsLoggedIn());
   const [isLoading, setIsLoading] = useState(authStore.getIsLoading());
   const [showError, setShowError] = useState(authStore.getShowError());
   const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [isLoggingIn, setIsLoggingIn] = useState(true);
 
   useEffect(() => {
     const handleChange = () => {
@@ -29,7 +31,11 @@ const Login = (props) => {
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    onLogin(username, password);
+    if (isLoggingIn) {
+      onLogin(email, password);
+    } else {
+      onSignup(username, email, password);
+    }
   };
 
   return isLoggedIn ? (
@@ -43,6 +49,9 @@ const Login = (props) => {
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
+        padding: "0",
+        boxSizing: "border-box",
+        fontFamily: "Roboto Mono, monospace",
       }}
     >
       <Form
@@ -58,14 +67,35 @@ const Login = (props) => {
         className="rounded"
         onSubmit={handleSubmit}
       >
-        <h1>Inicia Sesión</h1>
+        <h1 style={{ marginBottom: "30px" }}>
+          {isLoggingIn ? "Inicia Sesión" : "Registro de Usuario"}
+        </h1>
         {showError && (
-          <Alert variant="danger" style={{ width: "100%", marginTop: "20px" }}>
-            Error: Credenciales incorrectas, intenta de nuevo.
+          <Alert variant="danger" style={{ width: "100%" }}>
+            {isLoggingIn
+              ? "Error: Credenciales incorrectas, intenta de nuevo."
+              : "Error: Algo salio mal, intenta de nuevo"}
           </Alert>
         )}
-        <Container fluid style={{ padding: "0", marginTop: "20px" }}>
-          <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
+
+        {!isLoggingIn && (
+          <Container fluid style={{ padding: "0" }}>
+            <Form.Group className="mb-3">
+              <Form.Label className="fw-bold fs-5">Usuario</Form.Label>
+              <Form.Control
+                className="form-control-lg"
+                type="text"
+                style={{
+                  borderColor: "#B7B7B7",
+                }}
+                placeholder="Ingresa tu nombre de usuario"
+                onChange={(e) => setUsername(e.target.value)}
+              />
+            </Form.Group>
+          </Container>
+        )}
+        <Container fluid style={{ padding: "0" }}>
+          <Form.Group className="mb-3">
             <Form.Label className="fw-bold fs-5">Correo electrónico</Form.Label>
             <Form.Control
               className="form-control-lg"
@@ -74,13 +104,10 @@ const Login = (props) => {
               style={{
                 borderColor: "#B7B7B7",
               }}
-              onChange={(e) => setUsername(e.target.value)}
+              onChange={(e) => setEmail(e.target.value)}
             />
           </Form.Group>
-        </Container>
-
-        <Container fluid style={{ padding: "0" }}>
-          <Form.Group className="mb-3" controlId="formPlaintextPassword">
+          <Form.Group className="mb-3">
             <Form.Label className="fw-bold fs-5" column sm="2">
               Contraseña
             </Form.Label>
@@ -98,7 +125,12 @@ const Login = (props) => {
         <Button
           className="fs-5"
           variant="warning"
-          style={{ width: "100%", color: "white" }}
+          style={{
+            width: "100%",
+            color: "white",
+            backgroundColor: !isLoggingIn ? "#433878" : null,
+            marginTop: "10px",
+          }}
           type="submit"
         >
           {isLoading ? (
@@ -113,26 +145,33 @@ const Login = (props) => {
               />
               Cargando...
             </>
-          ) : (
+          ) : isLoggingIn ? (
             "Ingresar"
+          ) : (
+            "Registrarse"
           )}
         </Button>
-        <Container
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            marginTop: "10px",
-          }}
-          className="fs-5"
-        >
-          ¿No tienes cuenta?
-          <a
-            style={{ textDecoration: "none", marginLeft: "10px" }}
-            href="https://www.youtube.com/watch?v=dQw4w9WgXcQ&ab_channel=RickAstley"
+        {isLoggingIn && (
+          <Container
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              marginTop: "10px",
+            }}
+            className="fs-5"
           >
-            Registrate aquí
-          </a>
-        </Container>
+            ¿No tienes cuenta?
+            <Button
+              variant="link"
+              style={{ textDecoration: "none" }}
+              className="fs-5"
+              onClick={() => setIsLoggingIn(false)}
+            >
+              Registrate aquí
+            </Button>
+          </Container>
+        )}
       </Form>
     </div>
   );

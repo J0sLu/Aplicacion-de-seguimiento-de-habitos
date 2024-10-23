@@ -25,13 +25,20 @@ class AuthStore extends EventEmitter {
   handleAction(action) {
     switch (action.type) {
       case ACTION_TYPE.LOGIN:
-        this.handleLogin();
+      case ACTION_TYPE.SIGNUP:
+        this.handleSubmit();
         break;
       case ACTION_TYPE.LOGIN_SUCCEEDED:
         this.handleLoginSucceeded();
         break;
       case ACTION_TYPE.LOGIN_FAILED:
         this.handleLoginFailed();
+        break;
+      case ACTION_TYPE.SIGNUP_SUCCEEDED:
+        this.handleSignupSucceeded();
+        break;
+      case ACTION_TYPE.SIGNUP_FAILED:
+        this.handleSignupFailed();
         break;
       case ACTION_TYPE.LOGOUT: // Nuevo caso de LOGOUT
         this.handleLogout();
@@ -40,7 +47,7 @@ class AuthStore extends EventEmitter {
     }
   }
 
-  handleLogin() {
+  handleSubmit() {
     this.isLoading = true;
     this.emitChange();
   }
@@ -57,7 +64,19 @@ class AuthStore extends EventEmitter {
     this.emitChange();
   }
 
-  handleLogout() { // Nueva función para manejar el logout
+  handleSignupSucceeded() {
+    this.isLoading = false;
+    this.emitChange();
+  }
+
+  handleSignupFailed() {
+    this.isLoading = this.isLogedIn = false;
+    this.showError = true;
+    this.emitChange();
+  }
+
+  handleLogout() {
+    // Nueva función para manejar el logout
     this.isLogedIn = false;
     this.emitChange();
   }
@@ -79,4 +98,3 @@ const authStore = new AuthStore();
 dispatcher.register(authStore.handleAction.bind(authStore));
 
 export default authStore;
-

@@ -1,15 +1,13 @@
 class AuthService {
-  async login(username, password) {
+  async login(email, password) {
     try {
-      console.log(username);
-      console.log(password);
       const response = await fetch("http://localhost:8000/api/login/", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          email: username,
+          email: email,
           password: password,
         }),
       });
@@ -19,8 +17,31 @@ class AuthService {
       }
 
       const data = await response.json();
-      console.log(data);
       return data.exists;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  async signup(username, email, password) {
+    try {
+      const response = await fetch("http://localhost:8000/api/signup/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: email,
+          username: username,
+          password: password,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Credenciales incorrectas o error en el servidor");
+      }
+
+      return response.ok;
     } catch (e) {
       return false;
     }
