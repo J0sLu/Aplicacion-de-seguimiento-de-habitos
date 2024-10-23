@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import "./HabitDashboard.css";
 import Chart from "chart.js/auto";
 import authActionCreator from "../action-creators/AuthActionCreator"; // Importar acciones de autenticación
+import habitsActionCreator from "../action-creators/HabitsActionCreator";
 import authStore from "../stores/AuthStore";
+import habitsStore from "../stores/HabitStore";
+import ListGroup from "react-bootstrap/ListGroup";
 
 const Dashboard = () => {
   const [habitName, setHabitName] = useState("");
@@ -13,15 +15,14 @@ const Dashboard = () => {
   const [reminderTime, setReminderTime] = useState("08:00");
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
   const [reminderMessage, setReminderMessage] = useState(""); // Nuevo estado para el mensaje
+  const [habits, setHabits] = useState(habitsStore.fetchHabits());
 
   const navigate = useNavigate(); // Hook para redirección
 
   // Manejo de la creación de hábitos
   const handleHabitSubmit = (e) => {
     e.preventDefault();
-    alert(
-      `Hábito "${habitName}" creado con éxito! Frecuencia: ${frequency}, Categoría: ${category}, Objetivo: ${goal}`
-    );
+    habitsActionCreator.createHabit(habitName, frequency, category, goal);
   };
 
   // Manejo de los recordatorios
@@ -48,9 +49,15 @@ const Dashboard = () => {
       }
     };
 
+    const handleHabitsChange = () => {
+      setHabits(habitsStore.getHabits());
+    };
+
     authStore.addChangeListener(handleAuthChange);
+    habitsStore.addChangeListener(handleHabitsChange);
     return () => {
       authStore.removeChangeListener(handleAuthChange);
+      habitsStore.removeChangeListener(handleHabitsChange);
     };
   }, [navigate]);
 
@@ -105,28 +112,15 @@ const Dashboard = () => {
         padding: "20px",
       }}
     >
-      {/* Botón de cerrar sesión */}
-      <div
-        className="logout-container"
-        style={{ textAlign: "right", marginBottom: "20px" }}
-      >
-        <button
-          className="logout-button"
-          onClick={handleLogout}
-          style={{
-            width: "100%",
-            padding: "10px 20px",
-            backgroundColor: "#d9534f",
-            color: "white",
-            border: "none",
-            borderRadius: "5px",
-            cursor: "pointer",
-            fontSize: "1rem",
-          }}
-        >
-          Cerrar Sesión
-        </button>
-      </div>
+      {/* Lista de habitos */}
+      <ListGroup as="ul">
+        <ListGroup.Item as="li" active>
+          Habitos
+        </ListGroup.Item>
+        {habits.map((habit) => {
+          return <ListGroup.Item as="li">{habit}</ListGroup.Item>;
+        })}
+      </ListGroup>
 
       {/* Creación de hábitos */}
       <div
@@ -448,6 +442,28 @@ const Dashboard = () => {
             Guardar Recordatorio
           </button>
         </form>
+      </div>
+      {/* Botón de cerrar sesión */}
+      <div
+        className="logout-container"
+        style={{ textAlign: "right", marginBottom: "20px" }}
+      >
+        <button
+          className="logout-button"
+          onClick={handleLogout}
+          style={{
+            width: "100%",
+            padding: "10px 20px",
+            backgroundColor: "#d9534f",
+            color: "white",
+            border: "none",
+            borderRadius: "5px",
+            cursor: "pointer",
+            fontSize: "1rem",
+          }}
+        >
+          Cerrar Sesión
+        </button>
       </div>
     </div>
   );
