@@ -28,12 +28,11 @@ class Habit(models.Model):
         ('monthly', 'Monthly'),
     ]
 
-    
-
     id = models.AutoField(primary_key=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='habits')
     name = models.TextField()
     start_date = models.DateField()
+    category = models.TextField()
     frequency = models.CharField(max_length=10, choices=FREQUENCY_CHOICES)
     target = models.IntegerField()
     created_at = models.DateTimeField(auto_now_add=True)
@@ -42,7 +41,7 @@ class Habit(models.Model):
         return self.name
     
     def save(self, *args, **kwargs):
- 
+        # Verifica si el hábito ya existe
         super(Habit, self).save(*args, **kwargs)
 
 

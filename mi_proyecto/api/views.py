@@ -75,10 +75,16 @@ class HabitViewSet(viewsets.ModelViewSet):
 class HabitCreateView(APIView):
     def post(self, request):
         data = request.data
+        
+        # Agregar la fecha actual al campo "start_date"
+        data['start_date'] = datetime.now().date()
+        
+        # Serializar los datos con la fecha actual agregada
         serializer = HabitSerializer(data=data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
+        
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 #Vistas para visualiar los habitos de un usuario
