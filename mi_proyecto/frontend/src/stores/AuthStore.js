@@ -6,7 +6,7 @@ class AuthStore extends EventEmitter {
   constructor() {
     super();
     this.isLoading = false;
-    this.isLogedIn = true;
+    this.isLogedIn = false;
     this.showError = false;
   }
 
