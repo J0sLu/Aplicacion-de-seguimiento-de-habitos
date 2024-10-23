@@ -36,7 +36,11 @@ class VerifyUserView(APIView):
             user = User.objects.get(email=email)
             
             if user.check_password(password):  # Verifica la contraseña
-                return Response({"exists": True}, status=status.HTTP_200_OK)
+                return Response({
+                    "exists": True,
+                    "id": user.id,
+                    "username": user.username,
+                    }, status=status.HTTP_200_OK)
             else:
                 return Response({"exists 01": False}, status=status.HTTP_200_OK)
         except User.DoesNotExist:
