@@ -1,6 +1,7 @@
 import { EventEmitter } from "events";
 import dispatcher from "../dispatcher/Dispatcher";
 import { ACTION_TYPE } from "../constants/AppConstants";
+import habitsService from "../services/HabitsService";
 
 class HabitsStore extends EventEmitter {
   constructor() {
@@ -26,7 +27,7 @@ class HabitsStore extends EventEmitter {
         this.handleCreateHabit(action.habit);
         break;
       case ACTION_TYPE.CREATE_HABIT_SUCCEEDED:
-        this.handleCreateHabitSucceded();
+        this.handleCreateHabitSucceded(action.habit);
         break;
       case ACTION_TYPE.CREATE_HABIT_FAILED:
         this.handleCreateHabitFailed();
@@ -41,7 +42,8 @@ class HabitsStore extends EventEmitter {
   }
 
   handleCreateHabitSucceded(habit) {
-    this.habits[this.habit.length - 1] = habit;
+    this.habits.pop();
+    this.habits.push(habit);
     this.emitChange();
   }
 
@@ -50,16 +52,15 @@ class HabitsStore extends EventEmitter {
     this.emitChange();
   }
 
-  fetchHabits() {
-    this.habits = [
-      "Resolver 3 problemas de codeforces",
-      "Hacer contest con tu equipo",
-      "Aprender un nuevo tema",
-    ];
+  async fetchHabits() {
+    this.habits = await habitsService.fetchHabits(4);
+    console.log(this.habits);
     return this.habits;
   }
 
-  getHabits() {
+  async getHabits() {
+    this.habits = await habitsService.fetchHabits(4);
+    console.log(this.habits);
     return this.habits;
   }
 }

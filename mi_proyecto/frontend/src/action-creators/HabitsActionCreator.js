@@ -7,13 +7,15 @@ import {
 import habitsService from "../services/HabitsService";
 
 class HabitsActionCreator {
-  async createHabit(habitName, frequency, category, goal) {
-    dispatcher.dispatch(CreateHabitAction);
+  async createHabit(name, frequency, category, target) {
+    dispatcher.dispatch(
+      CreateHabitAction({ name, frequency, category, target })
+    );
     const createdHabit = await habitsService.createHabit(
-      habitName,
+      name,
       frequency,
       category,
-      goal
+      target
     );
 
     console.log(createdHabit);

@@ -15,7 +15,7 @@ const Dashboard = () => {
   const [reminderTime, setReminderTime] = useState("08:00");
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
   const [reminderMessage, setReminderMessage] = useState(""); // Nuevo estado para el mensaje
-  const [habits, setHabits] = useState(habitsStore.fetchHabits());
+  const [habits, setHabits] = useState([]);
 
   const navigate = useNavigate(); // Hook para redirección
 
@@ -49,9 +49,13 @@ const Dashboard = () => {
       }
     };
 
-    const handleHabitsChange = () => {
-      setHabits(habitsStore.getHabits());
+    const fetchHabits = async () => {
+      setHabits(await habitsStore.getHabits());
     };
+
+    const handleHabitsChange = () => {};
+
+    fetchHabits();
 
     authStore.addChangeListener(handleAuthChange);
     habitsStore.addChangeListener(handleHabitsChange);
@@ -118,7 +122,8 @@ const Dashboard = () => {
           Habitos
         </ListGroup.Item>
         {habits.map((habit) => {
-          return <ListGroup.Item as="li">{habit}</ListGroup.Item>;
+          console.log(habit);
+          return <ListGroup.Item as="li">{habit.name}</ListGroup.Item>;
         })}
       </ListGroup>
 
@@ -241,6 +246,7 @@ const Dashboard = () => {
           <div
             style={{
               marginBottom: "15px",
+              width: "100%",
             }}
           >
             <label
@@ -253,9 +259,12 @@ const Dashboard = () => {
             >
               Objetivo
             </label>
-            <select
+            <input
+              type="number"
               id="goal"
               value={goal}
+              min="0"
+              max="100"
               onChange={(e) => setGoal(e.target.value)}
               style={{
                 width: "100%",
@@ -264,11 +273,7 @@ const Dashboard = () => {
                 borderRadius: "5px",
                 border: "1px solid #ddd",
               }}
-            >
-              <option value="Diario">Objetivo Diario</option>
-              <option value="Semanal">Objetivo Semanal</option>
-              <option value="Mensual">Objetivo Mensual</option>
-            </select>
+            />
           </div>
           <button
             style={{

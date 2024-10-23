@@ -10,7 +10,7 @@ class HabitsService {
           name: name,
           frequency: frequency,
           category: category,
-          target: category,
+          target: target,
           user: "4",
         }),
       });
@@ -27,6 +27,7 @@ class HabitsService {
 
   async fetchHabits(userId) {
     try {
+      console.log(`http://localhost:8000/api/habits_user/?user_id=${userId}`);
       const response = await fetch(
         `http://localhost:8000/api/habits_user/?user_id=${userId}`,
         {
