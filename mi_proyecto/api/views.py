@@ -76,6 +76,14 @@ class HabitCreateView(APIView):
     def post(self, request):
         data = request.data
         
+        if data.get('frequency') == "Diario":
+            data['frequency'] = 'daily'
+        elif data.get('frequency') == "Semanal":
+            data['frequency'] = 'weekly'
+        elif data.get('frequency') == "Mensual":
+            data['frequency'] = 'monthly'
+
+
         # Agregar la fecha actual al campo "start_date"
         data['start_date'] = datetime.now().date()
         
