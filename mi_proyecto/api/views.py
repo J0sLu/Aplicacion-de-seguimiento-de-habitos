@@ -120,6 +120,132 @@ class ProgressViewSet(viewsets.ModelViewSet):
     queryset = Progress.objects.all()
     serializer_class = ProgressSerializer
     
+class ProgressHabitView(APIView):
+    def post(self, request):
+        user_id = request.data.get('user_id')
+
+        habitos = Habit.objects.filter(user_id=user_id)
+        progresos = []  # Lista para almacenar los progresos de cada hábito
+
+        for habito in habitos:
+            habito_id = habito.id
+        
+            if not habito_id:
+                return Response({"error": "habit_id is required"}, status=status.HTTP_400_BAD_REQUEST)
+            
+            try:
+                # Obtener el hábito y sus datos
+                frecuencia = habito.frequency  # Ej. "monthly", "weekly", "daily"
+                target = habito.target
+                habit_name = habito.name
+
+                # Fecha de hoy para referencia
+                today = datetime.today()
+
+                # Filtrar progresos según la frecuencia
+                if frecuencia == "monthly":
+                    # Primer y último día del mes actual
+                    start_date = today.replace(day=1)
+                    next_month = start_date.month % 12 + 1
+                    end_date = start_date.replace(month=next_month, day=1) - timedelta(days=1)
+                    
+                elif frecuencia == "weekly":
+                    # Inicio de la semana (lunes) y fin de la semana (domingo)
+                    start_date = today - timedelta(days=today.weekday())
+                    end_date = start_date + timedelta(days=6)
+                    
+                elif frecuencia == "daily":
+                    # Para progresos diarios, desde la fecha de inicio hasta hoy
+                    start_date = habito.start_date
+                    end_date = today
+                else:
+                    return Response({"error": "Invalid frequency"}, status=status.HTTP_400_BAD_REQUEST)
+
+                # Obtener todos los progresos del hábito en el rango de fechas
+                registros_progreso = Progress.objects.filter(
+                    habit_id=habito_id,
+                    date__gte=start_date,
+                    date__lte=end_date
+                )
+
+                # Sumar el progreso registrado
+                progreso_total = registros_progreso.count()
+                
+                # Calcular el progreso en escala de 0 a 1 y redondear a 2 decimales
+                progreso_escala = round(min(progreso_total / target, 1.0), 2) if target else 0
+
+                # Agregar los datos del hábito al diccionario de progresos
+                progresos.append({
+                    "habit_id": habito_id,
+                    "name": habit_name,
+                    "progress": progreso_escala,
+                    "frequency": frecuencia
+                })
+            
+            except Habit.DoesNotExist:
+                return Response({"error": f"Habit with id {habito_id} not found"}, status=status.HTTP_404_NOT_FOUND)
+        
+        return Response(progresos, status=status.HTTP_200_OK)
+
+class ProgressHabitViewByIDHabit(APIView):
+    def post(self, request):
+        habito_id = request.data.get('habit_id')
+    
+        if not habito_id:
+            return Response({"error": "habit_id is required"}, status=status.HTTP_400_BAD_REQUEST)
+        
+        try:
+            # Obtener el hábito
+            habito = Habit.objects.get(id=habito_id)
+            frecuencia = habito.frequency  # Ej. "mes", "semana", "diario"
+            target = habito.target
+            print (frecuencia)
+            print (target)
+
+            # Fecha de hoy para referencia
+            today = datetime.today()
+
+            # Filtrar progresos según la frecuencia
+            if frecuencia == "monthly":
+                # Obtener el primer y último día del mes actual
+                start_date = today.replace(day=1)
+                next_month = start_date.month % 12 + 1
+                end_date = start_date.replace(month=next_month, day=1) - timedelta(days=1)
+                
+            elif frecuencia == "weekly":
+                # Obtener el inicio de la semana (lunes) y el final (domingo)
+                start_date = today - timedelta(days=today.weekday())
+                end_date = start_date + timedelta(days=6)
+                
+            elif frecuencia == "daily":
+                # Para progresos diarios, solo la fecha actual
+                start_date = habito.start_date
+                end_date = today
+                
+
+            
+            # Obtener todos los progresos del hábito en el rango de fechas
+            progresos = Progress.objects.filter(
+                habit_id=habito_id,
+                date__gte=start_date,
+                date__lte=end_date
+            )
+
+            # Sumar el progreso registrado (ajustar a `progress` o el nombre correcto)
+            progreso_total = progresos.count()
+            print(progreso_total)
+            # Calcular el progreso en escala de 0 a 1
+            progreso_escala =  round(min(progreso_total / target, 1.0), 2) if target else 0
+
+            return Response({
+                "habit_id": habito_id,
+                "progress": progreso_escala,
+                "frequency": frecuencia
+            }, status=status.HTTP_200_OK)
+        
+        except Habit.DoesNotExist:
+            return Response({"error": "Habit not found"}, status=status.HTTP_404_NOT_FOUND)
+
 
 
 class ProgressAction(APIView):
@@ -254,6 +380,26 @@ class NotifyUserIDAll(APIView):
         serializer = NotificationSerializer(notifications, many=True)
         
         return Response(serializer.data, status=status.HTTP_200_OK)
+    
+
+class NotifyChangeStatus(APIView):
+    def post(self, request):
+        id = request.data.get('id')
+        is_read = request.data.get('is_read')
+
+        noti = Notification.objects.get(id=id)
+        #print(noti.is_read)
+        if not noti:
+            return Response({"message": "Notification not found"}, status=status.HTTP_404_NOT_FOUND)
+
+        if is_read:
+            return Response({"message": "Notification is read"}, status=status.HTTP_200_OK)
+        else:
+            noti.is_read = True
+            noti.save()
+            noti = Notification.objects.get(id=id)
+            print(noti.is_read)
+            return Response({"message": "Notification status changed"}, status=status.HTTP_200_OK)
 
 # Vistas para el modelo Reward
 class RewardViewSet(viewsets.ModelViewSet):
