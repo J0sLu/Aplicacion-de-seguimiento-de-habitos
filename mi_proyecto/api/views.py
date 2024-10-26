@@ -75,6 +75,7 @@ class HabitViewSet(viewsets.ModelViewSet):
 class HabitCreateView(APIView):
     def post(self, request):
         data = request.data
+        print(data)
         
         if data.get('frequency') == "Diario":
             data['frequency'] = 'daily'
@@ -86,7 +87,7 @@ class HabitCreateView(APIView):
 
         # Agregar la fecha actual al campo "start_date"
         data['start_date'] = datetime.now().date()
-        
+
         # Serializar los datos con la fecha actual agregada
         serializer = HabitSerializer(data=data)
         if serializer.is_valid():
@@ -106,14 +107,12 @@ class HabitUserID(APIView):
     
         # Filtrar hábitos por user_id
         habits = Habit.objects.filter(user_id=user_id)
-
         # Verificar si existen hábitos
         if not habits.exists():
             return Response({"message": "No habits found for this user"}, status=status.HTTP_404_NOT_FOUND)
 
         # Serializar los hábitos
         serializer = HabitSerializer(habits, many=True)
-        
         return Response(serializer.data, status=status.HTTP_200_OK)
 # Vistas para el modelo Progress
 class ProgressViewSet(viewsets.ModelViewSet):
