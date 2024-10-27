@@ -1,6 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Chart from "chart.js/auto";
+import { Navbar, Nav, Button, Dropdown, Badge } from "react-bootstrap";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import authActionCreator from "../action-creators/AuthActionCreator"; // Importar acciones de autenticación
 import habitsActionCreator from "../action-creators/HabitsActionCreator";
 import authStore from "../stores/AuthStore";
@@ -17,6 +20,7 @@ const Dashboard = () => {
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
   const [reminderMessage, setReminderMessage] = useState(""); // Nuevo estado para el mensaje
   const [habits, setHabits] = useState([]);
+  const [notifications, setNotifications] = useState([]); 
 
   const navigate = useNavigate(); // Hook para redirección
 
@@ -26,15 +30,64 @@ const Dashboard = () => {
     habitsActionCreator.createHabit(habitName, frequency, category, goal);
   };
 
-  // Manejo de los recordatorios
   const handleReminderSubmit = (e) => {
     e.preventDefault();
-    alert(
-      `Recordatorio establecido para las ${reminderTime} con mensaje: "${reminderMessage}". Notificaciones: ${
-        notificationsEnabled ? "Habilitadas" : "Deshabilitadas"
-      }`
-    );
+
+    const newNotification = {
+      message: `Recordatorio para las ${reminderTime}: ${reminderMessage}`,
+      time: reminderTime,
+      read: false,
+    };
+
+    setNotifications((prevNotifications) => [...prevNotifications, newNotification]);
+
+    toast.success(`Recordatorio creado para las ${reminderTime}`, {
+      position: "top-right",
+      autoClose: 5000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+    });
   };
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const currentTime = new Date().toLocaleTimeString("es-ES", {
+        hour: "2-digit",
+        minute: "2-digit",
+      });
+
+      notifications.forEach((notification, index) => {
+        if (
+          notification.time === currentTime &&
+          notificationsEnabled &&
+          !notification.read
+        ) {
+          toast.info(`📌 ${notification.message}`, {
+            position: "top-right",
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+          });
+
+          // Marcar como "leído" inmediatamente
+          setNotifications((prevNotifications) =>
+            prevNotifications.map((notif, i) =>
+              i === index ? { ...notif, read: true } : notif
+            )
+          );
+        }
+      });
+    }, 1000); // Revisar cada segundo
+
+    // Limpiar el intervalo al desmontar el componente
+    return () => clearInterval(interval);
+  }, [notifications, notificationsEnabled]);
 
   // Manejo de cerrar sesión
   const handleLogout = () => {
@@ -105,18 +158,54 @@ const Dashboard = () => {
   }, []);
 
   return (
-    <div
-      className="container"
-      style={{
-        display: "grid",
-        gridTemplateColumns: "1fr 1fr",
-        gridTemplateRows: "auto auto",
-        gap: "20px",
-        maxWidth: "1000px",
-        width: "100%",
-        padding: "20px",
-      }}
-    >
+    <>
+      {/* Navbar con menú superior */}
+      <Navbar bg="dark" variant="dark" expand="lg">
+        <Navbar.Brand href="#home">Gestión de Hábitos</Navbar.Brand>
+        <Navbar.Toggle aria-controls="basic-navbar-nav" />
+        <Navbar.Collapse id="basic-navbar-nav">
+          <Nav className="me-auto">
+            <Nav.Link href="#home">Inicio</Nav.Link>
+          </Nav>
+          <Nav>
+            {/* Notificaciones */}
+            <Dropdown alignRight>
+              <Dropdown.Toggle variant="success" id="dropdown-basic">
+                Notificaciones{" "}
+                <Badge bg="light" text="dark">
+                  {notifications.filter((notif) => !notif.read).length}
+                </Badge>
+              </Dropdown.Toggle>
+              <Dropdown.Menu>
+                {notifications.map((notification, index) => (
+                  <Dropdown.Item key={index}>{notification.message}</Dropdown.Item>
+                ))}
+              </Dropdown.Menu>
+            </Dropdown>
+            <Button
+              variant="outline-light"
+              onClick={handleLogout}
+              style={{ marginLeft: "15px" }}
+            >
+              Cerrar Sesión
+            </Button>
+          </Nav>
+        </Navbar.Collapse>
+      </Navbar>
+
+      {/* Contenido principal */}
+      <div
+        className="container"
+        style={{
+          display: "grid",
+          gridTemplateColumns: "1fr 1fr",
+          gridTemplateRows: "auto auto",
+          gap: "20px",
+          maxWidth: "1000px",
+          width: "100%",
+          padding: "20px",
+        }}
+      >
       {/* Lista de habitos */}
       <ListGroup as="ul">
         <ListGroup.Item as="li" active>
@@ -341,30 +430,19 @@ const Dashboard = () => {
           boxShadow: "0px 5px 10px rgba(0, 0, 0, 0.1)",
         }}
       >
-        <h2
-          style={{
-            marginBottom: "15px",
-            fontSize: "1.5rem",
-            textAlign: "center",
-            color: "#333",
-          }}
-        >
-          Recordatorios
-        </h2>
-        <form id="reminderForm" onSubmit={handleReminderSubmit}>
-          <div
-            style={{
-              marginBottom: "15px",
-            }}
-          >
-            <label
-              style={{
-                fontWeight: "bold",
-                marginBottom: "5px",
-                display: "block",
-              }}
-              htmlFor="reminderTime"
-            >
+      <h2 style={{ marginBottom: "15px", fontSize: "1.5rem", textAlign: "center", color: "#333" }}>
+            Recordatorios
+          </h2>
+          <form id="reminderForm" onSubmit={handleReminderSubmit}>
+            <div style={{ marginBottom: "15px" }}>
+              <label
+                htmlFor="reminderTime"
+                style={{
+                  fontWeight: "bold",
+                  marginBottom: "5px",
+                  display: "block",
+                }}
+              >
               Hora del Recordatorio
             </label>
             <input
@@ -411,75 +489,28 @@ const Dashboard = () => {
               }}
             />
           </div>
-          <div
-            style={{
-              marginBottom: "15px",
-            }}
-          >
-            <label
-              style={{
-                fontWeight: "bold",
-                marginBottom: "5px",
-                display: "block",
-              }}
-              htmlFor="notificationsEnabled"
-            >
-              Notificaciones
-            </label>
-            <input
-              type="checkbox"
-              id="notificationsEnabled"
-              checked={notificationsEnabled}
-              onChange={(e) => setNotificationsEnabled(e.target.checked)}
+            <button
               style={{
                 width: "100%",
                 padding: "10px",
-                marginTop: "5px",
+                backgroundColor: "#701996",
+                color: "white",
+                border: "none",
                 borderRadius: "5px",
-                border: "1px solid #ddd",
+                cursor: "pointer",
+                fontSize: "1rem",
               }}
-            />
-          </div>
-          <button
-            style={{
-              width: "100%",
-              padding: "10px",
-              backgroundColor: "#701996",
-              color: "white",
-              border: "none",
-              borderRadius: "5px",
-              cursor: "pointer",
-              fontSize: "1rem",
-            }}
-            type="submit"
-          >
-            Guardar Recordatorio
-          </button>
-        </form>
+              type="submit"
+            >
+              Guardar Recordatorio
+            </button>
+          </form>
+        </div>
       </div>
-      {/* Botón de cerrar sesión */}
-      <div
-        className="logout-container"
-        style={{ textAlign: "right", marginBottom: "20px" }}
-      >
-        <button
-          className="logout-button"
-          onClick={handleLogout}
-          style={{
-            width: "100%",
-            padding: "10px 20px",
-            backgroundColor: "#d9534f",
-            color: "white",
-            border: "none",
-            borderRadius: "5px",
-            cursor: "pointer",
-            fontSize: "1rem",
-          }}
-        >
-          Cerrar Sesión
-        </button>
-      </div>
-    </div>
+
+      {/* Contenedor para las notificaciones de toastify */}
+      <ToastContainer />
+    </>
   );
 };
 
