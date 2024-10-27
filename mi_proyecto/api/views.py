@@ -75,6 +75,7 @@ class HabitViewSet(viewsets.ModelViewSet):
 class HabitCreateView(APIView):
     def post(self, request):
         data = request.data
+        print(request.data.get('category'))
         print(data)
         
         if data.get('frequency') == "Diario":
@@ -87,7 +88,6 @@ class HabitCreateView(APIView):
 
         # Agregar la fecha actual al campo "start_date"
         data['start_date'] = datetime.now().date()
-
         # Serializar los datos con la fecha actual agregada
         serializer = HabitSerializer(data=data)
         if serializer.is_valid():
@@ -118,11 +118,14 @@ class HabitUserID(APIView):
 class ProgressViewSet(viewsets.ModelViewSet):
     queryset = Progress.objects.all()
     serializer_class = ProgressSerializer
-    
-class ProgressHabitView(APIView):
-    def post(self, request):
-        user_id = request.data.get('user_id')
 
+
+#PROGRESO DE LOS HABITOS
+class ProgressHabitView(APIView):
+    def get(self, request):
+
+        user_id = request.query_params.get('user_id')
+        
         habitos = Habit.objects.filter(user_id=user_id)
         progresos = []  # Lista para almacenar los progresos de cada hábito
 
@@ -178,7 +181,10 @@ class ProgressHabitView(APIView):
                     "habit_id": habito_id,
                     "name": habit_name,
                     "progress": progreso_escala,
-                    "frequency": frecuencia
+                    "frequency": frecuencia,
+                    "category": habito.category,
+                    "target": habito.target,
+                    "times": progreso_total
                 })
             
             except Habit.DoesNotExist:

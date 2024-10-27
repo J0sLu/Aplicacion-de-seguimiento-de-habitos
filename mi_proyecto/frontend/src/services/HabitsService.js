@@ -25,7 +25,7 @@ class HabitsService {
     }
   }
 
-  async fetchHabits(userId) {
+/*   async fetchHabits(userId) {
     try {
       console.log(`http://localhost:8000/api/habits_user/?user_id=${userId}`);
       const response = await fetch(
@@ -46,7 +46,32 @@ class HabitsService {
     } catch (e) {
       return null;
     }
-  }
+  } */
+
+    async fetchHabits(userId) {
+      try {
+        console.log(`http://localhost:8000/api/progress_habit/?user_id=${userId}`);
+        const response = await fetch(
+          `http://localhost:8000/api/progress_habit/?user_id=${userId}`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+  
+        if (!response.ok) {
+          throw new Error("Error en el servidor");
+        }
+  
+        return await response.json();
+      } catch (e) {
+        return null;
+      }
+    }
+
+
 }
 
 const habitsService = new HabitsService();

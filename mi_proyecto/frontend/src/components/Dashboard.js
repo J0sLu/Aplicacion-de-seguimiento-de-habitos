@@ -6,6 +6,7 @@ import habitsActionCreator from "../action-creators/HabitsActionCreator";
 import authStore from "../stores/AuthStore";
 import habitsStore from "../stores/HabitStore";
 import ListGroup from "react-bootstrap/ListGroup";
+import  ProgressBar  from "react-bootstrap/ProgressBar";
 
 const Dashboard = () => {
   const [habitName, setHabitName] = useState("");
@@ -122,8 +123,16 @@ const Dashboard = () => {
           Habitos
         </ListGroup.Item>
         {habits.map((habit) => {
+          const progressPercentage = habit.progress * 100;
           console.log(habit);
-          return <ListGroup.Item as="li">{habit.name}</ListGroup.Item>;
+          return <ListGroup.Item as="li">
+            <div>{habit.name}</div>
+            <div>Frecuencia: {habit.frequency}</div>
+            <div>Categoría: {habit.category}</div>
+            <div>Objetivo: {habit.target}</div>
+            <div>Progreso: {habit.times}</div>
+            <ProgressBar now={progressPercentage} label={`${progressPercentage}%`} />
+          </ListGroup.Item>;
         })}
       </ListGroup>
 
