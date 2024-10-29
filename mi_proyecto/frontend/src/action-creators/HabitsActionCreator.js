@@ -1,8 +1,12 @@
 import dispatcher from "../dispatcher/Dispatcher";
 import {
   CreateHabitAction,
-  CreateHabitSuccededAction,
+  CreateHabitSucceededAction,
   CreateHabitFailedAction,
+  DeleteHabitSucceededAction,
+  DeleteHabitFailedAction,
+  UpdateProgressSucceededAction,
+  UpdateProgressFailedAction,
 } from "../actions/habits/HabitsActions";
 import habitsService from "../services/HabitsService";
 
@@ -17,9 +21,27 @@ class HabitsActionCreator {
     );
 
     if (createdHabit) {
-      dispatcher.dispatch(CreateHabitSuccededAction);
+      dispatcher.dispatch(CreateHabitSucceededAction);
     } else {
       dispatcher.dispatch(CreateHabitFailedAction);
+    }
+  }
+
+  async deleteHabit(id) {
+    const didDelete = await habitsService.deleteHabit(id);
+    if (didDelete) {
+      dispatcher.dispatch(DeleteHabitSucceededAction);
+    } else {
+      dispatcher.dispatch(DeleteHabitFailedAction);
+    }
+  }
+
+  async updateProgress(id) {
+    const didUpdate = await habitsService.updateProgress(id);
+    if (didUpdate) {
+      dispatcher.dispatch(UpdateProgressSucceededAction);
+    } else {
+      dispatcher.dispatch(UpdateProgressFailedAction);
     }
   }
 }

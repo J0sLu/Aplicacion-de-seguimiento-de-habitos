@@ -40,6 +40,14 @@ const Dashboard = () => {
     setGoal("");
   };
 
+  const handleDeleteHabit = (id) => {
+    habitsActionCreator.deleteHabit(id);
+  };
+
+  const handleUpdateProgress = (id) => {
+    habitsActionCreator.updateProgress(id);
+  };
+
   const handleReminderSubmit = (e) => {
     e.preventDefault();
 
@@ -259,14 +267,14 @@ const Dashboard = () => {
                 <div className="d-flex justify-content-between align-items-center mt-2">
                   <button
                     className="btn btn-success mt-2"
-                    // Asegúrate de implementar la función handleDeleteHabit
+                    onClick={() => handleUpdateProgress(habit.habit_id)}
                   >
                     Marcar progreso
                   </button>
 
                   <button
                     className="btn btn-danger mt-2"
-                    // Asegúrate de implementar la función handleDeleteHabit
+                    onClick={() => handleDeleteHabit(habit.habit_id)}
                   >
                     Eliminar Hábito
                   </button>

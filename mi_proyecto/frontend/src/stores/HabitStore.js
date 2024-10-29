@@ -30,10 +30,16 @@ class HabitsStore extends EventEmitter {
         this.handleCreateHabit();
         break;
       case ACTION_TYPE.CREATE_HABIT_SUCCEEDED:
-        this.handleCreateHabitSucceded();
+        this.handleCreateHabitSucceeded();
         break;
       case ACTION_TYPE.CREATE_HABIT_FAILED:
         this.handleCreateHabitFailed();
+        break;
+      case ACTION_TYPE.DELETE_HABIT_SUCCEEDED:
+        this.handleDeleteHabitSucceeded();
+        break;
+      case ACTION_TYPE.DELETE_HABIT_FAILED:
+        this.handleDeleteHabitFailed();
         break;
       default:
     }
@@ -44,7 +50,7 @@ class HabitsStore extends EventEmitter {
     this.emitChange();
   }
 
-  handleCreateHabitSucceded() {
+  handleCreateHabitSucceeded() {
     toast.success("Hábito creado exitosamente");
     this.isCreating = false;
     this.emitChange();
@@ -55,6 +61,26 @@ class HabitsStore extends EventEmitter {
       "Algo salio mal creando el habito, intenta de nuevo sin repetir el nombre"
     );
     this.isCreating = false;
+    this.emitChange();
+  }
+
+  handleDeleteHabitSucceeded() {
+    toast.success("Hábito eliminado exitosamente");
+    this.emitChange();
+  }
+
+  handleDeleteHabitFailed() {
+    toast.error("Algo salio mal eliminando el habito, intenta de nuevo");
+    this.emitChange();
+  }
+
+  handleUpdateProgressSucceeded() {
+    toast.success("Progreso actualizado exitosamente");
+    this.emitChange();
+  }
+
+  handleUpdateprogressFailed() {
+    toast.error("Algo salio mal actualizando el progreso, intenta de nuevo");
     this.emitChange();
   }
 
