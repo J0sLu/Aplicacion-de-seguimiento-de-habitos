@@ -1,5 +1,8 @@
 from django.db import models
 from django.contrib.auth.hashers import make_password, check_password
+import uuid
+from django.utils import timezone
+from datetime import timedelta
 class User(models.Model):
     id = models.BigAutoField(primary_key=True)
     username = models.TextField()
@@ -32,7 +35,7 @@ class Habit(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='habits')
     name = models.TextField()
     start_date = models.DateField()
-    category = models.CharField(max_length=255, default='default_category') 
+    category = models.TextField(max_length=255, default='default_category') 
     frequency = models.CharField(max_length=10, choices=FREQUENCY_CHOICES)
     target = models.IntegerField()
     created_at = models.DateTimeField(auto_now_add=True)
@@ -76,3 +79,17 @@ class Reward(models.Model):
 
     def __str__(self):
         return self.description
+    
+
+class Token(models.Model):
+    id = models.BigAutoField(primary_key=True)
+    id_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='tokens', db_column='id_user')
+    token = models.CharField(max_length=255, unique=True, default=uuid.uuid4)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Token for {self.id_user.username} created at {self.created_at}"
+
+    def is_expired(self):
+        # Calcula si el token tiene más de 2 días de antigüedad
+        return timezone.now() > self.created_at + timedelta(days=2)

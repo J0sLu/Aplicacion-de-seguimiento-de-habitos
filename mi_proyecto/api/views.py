@@ -3,7 +3,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import viewsets
 from rest_framework import status
-from .models import User, Habit, Progress, Notification, Reward
+from .models import User, Habit, Progress, Notification, Reward, Token
 from .serializers import UserSerializer, HabitSerializer, ProgressSerializer, NotificationSerializer, RewardSerializer
 from django.contrib.auth.hashers import make_password
 from django.http import HttpResponse
@@ -35,10 +35,22 @@ class VerifyUserView(APIView):
         try:
             user = User.objects.get(email=email)
             
-            if user.check_password(password):  # Verifica la contraseña
+            if user.check_password(password):
+                # Verifica si hay un token no expirado para el usuario
+                token_auth = Token.objects.filter(id_user=user).order_by('-created_at').first()
+
+                if token_auth and not token_auth.is_expired():
+                    # Si hay un token y no ha expirado, se devuelve el token existente
+                    token = token_auth.token
+                else:
+                    # Si no hay un token o ha expirado, se crea uno nuevo
+                    token_auth = Token.objects.create(id_user=user)
+                    token = token_auth.token
+
                 return Response({
                     "exists": True,
                     "id": user.id,
+                    "token": token,
                     "username": user.username,
                     }, status=status.HTTP_200_OK)
             else:
@@ -354,7 +366,42 @@ class ProgressCurrentWeek(APIView):
         
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+#Vista para ver los progresos de un usuario en un rango de fechas
+class ProgressDateRangeView(APIView):
+    def get(self, request):
+        # Obtener habit_id, start_date y end_date de los parámetros de la URL
+        habit_id = request.query_params.get('habit_id')
+        start_date = request.query_params.get('start_date')
+        end_date = request.query_params.get('end_date')
 
+        # Validar los parámetros obligatorios
+        if not habit_id:
+            return Response({"error": "habit_id is required"}, status=status.HTTP_400_BAD_REQUEST)
+        if not start_date or not end_date:
+            return Response({"error": "start_date and end_date are required"}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Convertir las fechas de texto a objetos de fecha
+        try:
+            start_date = datetime.strptime(start_date, "%Y-%m-%d").date()
+            end_date = datetime.strptime(end_date, "%Y-%m-%d").date()
+        except ValueError:
+            return Response({"error": "Invalid date format. Use YYYY-MM-DD"}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Filtrar los progresos en el rango de fechas
+        progress = Progress.objects.filter(
+            habit_id=habit_id,
+            date__gte=start_date,
+            date__lte=end_date
+        )
+
+        # Verificar si hay progresos
+        if not progress.exists():
+            return Response({"message": "No progress found for this habit in the specified date range"}, status=status.HTTP_404_NOT_FOUND)
+        
+        # Serializar los progresos
+        serializer = ProgressSerializer(progress, many=True)
+        
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 # Vistas para el modelo Notification
 class NotificationViewSet(viewsets.ModelViewSet):

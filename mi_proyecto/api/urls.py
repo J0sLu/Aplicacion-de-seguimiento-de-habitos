@@ -25,12 +25,14 @@ urlpatterns = [
     path('api/notify_user/', NotifyUserID.as_view()),  # Cambia a esta línea
     path('api/notify_all/', NotifyUserIDAll.as_view()),  # Cambia a esta línea
     path('api/progress_create/', ProgressAction.as_view()),  # Cambia a esta línea
+    path('api/progress_date/', ProgressDateRangeView.as_view()),  # Cambia a esta línea
     path('api/progress_month/', ProgressUserDateView.as_view()),  # Cambia a esta línea
     path('api/progress_week/', ProgressCurrentWeek.as_view()),  # Cambia a esta línea
     path('api/progress_habit/', ProgressHabitView.as_view()),  # Cambia a esta línea
     path('api/notitfy_change/', NotifyChangeStatus.as_view()),
     path('api/notitfy_create/', NotifyCreateView.as_view()),
     path('api/habit_erase/', HabitEraseView.as_view())
+
     
 
     
