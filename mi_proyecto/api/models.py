@@ -32,7 +32,7 @@ class Habit(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='habits')
     name = models.TextField()
     start_date = models.DateField()
-    models.CharField(max_length=255, default='default_category') 
+    category = models.CharField(max_length=255, default='default_category') 
     frequency = models.CharField(max_length=10, choices=FREQUENCY_CHOICES)
     target = models.IntegerField()
     created_at = models.DateTimeField(auto_now_add=True)

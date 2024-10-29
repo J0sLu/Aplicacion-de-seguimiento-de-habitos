@@ -56,6 +56,12 @@ class HabitsStore extends EventEmitter {
     this.emitChange();
   }
 
+  handleEliminateHabit() {
+    toast.error("Este habito ha sido eliminado");
+    this.isEliminating = true;
+    this.emitChange();
+  }
+
   async fetchHabits() {
     this.habits = await habitsService.fetchHabits(4);
     console.log(this.habits);

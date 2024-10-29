@@ -75,8 +75,8 @@ class HabitViewSet(viewsets.ModelViewSet):
 class HabitCreateView(APIView):
     def post(self, request):
         data = request.data
-
-        habito = Habit.objects.filter(name=data.get('name'))
+        
+        habito = Habit.objects.filter(name=data.get('name'), user_id=data.get('user_id'))
 
         if habito.exists():
             
@@ -274,7 +274,10 @@ class ProgressHabitViewByIDHabit(APIView):
 class ProgressAction(APIView):
     def post(self, request):
         data = request.data
+        data['date'] = datetime.now().date()
+        data['progress'] = 1
         serializer = ProgressSerializer(data=data)
+
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
