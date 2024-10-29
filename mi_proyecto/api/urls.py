@@ -14,7 +14,7 @@ router.register(r'notifications', NotificationViewSet)
 router.register(r'rewards', RewardViewSet)
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    #path('admin/', admin.site.urls),
     path('api/', include(router.urls)),
     path('api/login/', VerifyUserView.as_view()),
     path('', Home_view.as_view(), name='home'),  # Ruta para la página principal
@@ -28,8 +28,10 @@ urlpatterns = [
     path('api/progress_month/', ProgressUserDateView.as_view()),  # Cambia a esta línea
     path('api/progress_week/', ProgressCurrentWeek.as_view()),  # Cambia a esta línea
     path('api/progress_habit/', ProgressHabitView.as_view()),  # Cambia a esta línea
-    path('api/not_change/', NotifyChangeStatus.as_view()),
+    path('api/notitfy_change/', NotifyChangeStatus.as_view()),
+    path('api/notitfy_create/', NotifyCreateView.as_view()),
     path('api/habit_erase/', HabitEraseView.as_view())
+    
 
     
 ]

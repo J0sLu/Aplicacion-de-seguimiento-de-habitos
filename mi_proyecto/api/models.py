@@ -32,7 +32,7 @@ class Habit(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='habits')
     name = models.TextField()
     start_date = models.DateField()
-    category = models.TextField()
+    models.CharField(max_length=255, default='default_category') 
     frequency = models.CharField(max_length=10, choices=FREQUENCY_CHOICES)
     target = models.IntegerField()
     created_at = models.DateTimeField(auto_now_add=True)
@@ -60,6 +60,7 @@ class Notification(models.Model):
     id = models.BigAutoField(primary_key=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='notifications')
     message = models.TextField()
+    frequency = models.TextField(max_length=255, default='default_category') 
     sent_at = models.DateTimeField(auto_now_add=True)
     is_read = models.BooleanField(default=False)
 

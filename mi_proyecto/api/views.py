@@ -424,6 +424,17 @@ class NotifyChangeStatus(APIView):
             print(noti.is_read)
             return Response({"message": "Notification status changed"}, status=status.HTTP_200_OK)
 
+class NotifyCreateView(APIView):
+    def post(self, request):
+        data = request.data
+        serializer = NotificationSerializer(data=data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+
 # Vistas para el modelo Reward
 class RewardViewSet(viewsets.ModelViewSet):
     queryset = Reward.objects.all()
