@@ -75,6 +75,13 @@ class HabitViewSet(viewsets.ModelViewSet):
 class HabitCreateView(APIView):
     def post(self, request):
         data = request.data
+
+        habito = Habit.objects.filter(name=data.get('name'))
+
+        if habito.exists():
+            
+            return Response({"error": "Habit already exists"}, status=status.HTTP_400_BAD_REQUEST)
+
         print(request.data.get('category'))
         print(data)
         
@@ -95,6 +102,17 @@ class HabitCreateView(APIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+class HabitEraseView(APIView):
+    def post(self, request):
+        habit_id = request.data.get('habit_id')
+        try:
+            habit = Habit.objects.get(id=habit_id)
+        except Habit.DoesNotExist:
+            return Response({"error": "Habit not found"}, status=status.HTTP_404_NOT_FOUND)
+
+        habit.delete()
+        return Response({"message": "Habit deleted"}, status=status.HTTP_200_OK)
 
 #Vistas para visualiar los habitos de un usuario
 class HabitUserID(APIView):
