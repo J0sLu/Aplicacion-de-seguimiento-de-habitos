@@ -18,6 +18,7 @@ class AuthActionCreator {
       dispatcher.dispatch(LoginSuccededAction);
       localStorage.setItem("id", response.id);
       localStorage.setItem("user", response.username);
+      localStorage.setItem("token", response.token);
     } else {
       dispatcher.dispatch(LoginFailedAction);
     }

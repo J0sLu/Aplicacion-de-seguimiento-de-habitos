@@ -127,11 +127,12 @@ const Login = (props) => {
         </Container>
         <Button
           className="fs-5"
-          variant="warning"
+          //variant="warning"
           style={{
             width: "100%",
             color: "white",
-            backgroundColor: !isLoggingIn ? "#433878" : null,
+            //backgroundColor: !isLoggingIn ? "#433878" : null,
+            backgroundColor: "#3A5474",
             marginTop: "10px",
           }}
           type="submit"

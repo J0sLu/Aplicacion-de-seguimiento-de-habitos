@@ -3,3 +3,8 @@ body {
   padding: 0;
   box-sizing: border-box;
 }
+
+
+.progress-bar.bg-miColorPersonalizado {
+  background-color: #A3C4F3; /* Reemplaza #FF0000 con el color que desees */
+}

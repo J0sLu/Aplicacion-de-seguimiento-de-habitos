@@ -242,12 +242,14 @@ const Dashboard = () => {
       >
         {/* Lista de habitos */}
         <ListGroup as="ul">
-          <ListGroup.Item as="li" active>
-            Habitos
+          <ListGroup.Item as="li" active style={{
+            backgroundColor: "#3A5474 ",
+          }}>
+            <h3>Hábitos</h3>
           </ListGroup.Item>
           {habits.map((habit) => {
             const progressPercentage = habit.progress * 100;
-            console.log(habit);
+        
             return (
               <ListGroup.Item as="li">
                 <h5>{habit.name}</h5>{" "}
@@ -255,10 +257,10 @@ const Dashboard = () => {
                 <ProgressBar
                   now={progressPercentage}
                   label={`${progressPercentage}%`}
-                  style={{
-                    backgroundColor: "#f8d7da",
-                  }}
+                  style={{ height: "20px" }}
+                  variant="miColorPersonalizado"
                 />
+
                 <div className="d-flex justify-content-between align-items-center mt-2">
                   <div>Frecuencia: {habit.frequency}</div>
                   <div>Categoría: {habit.category}</div>
@@ -266,15 +268,15 @@ const Dashboard = () => {
                 </div>
                 <div className="d-flex justify-content-between align-items-center mt-2">
                   <button
-                    className="btn btn-success mt-2"
+                    className="btn  mt-2"  style={{backgroundColor: "#3A5474", color: "white"}}
                     onClick={() => handleUpdateProgress(habit.habit_id)}
                   >
                     Marcar progreso
                   </button>
 
                   <button
-                    className="btn btn-danger mt-2"
-                    onClick={() => handleDeleteHabit(habit.habit_id)}
+                    className="btn mt-2" style={{backgroundColor: "#FCE79A"}}
+                    onClick={() => handleDeleteHabit(habit.habit_id)} 
                   >
                     Eliminar Hábito
                   </button>
@@ -436,7 +438,7 @@ const Dashboard = () => {
               style={{
                 width: "100%",
                 padding: "10px",
-                backgroundColor: "#701996",
+                backgroundColor: "#3A5474 ",
                 color: "white",
                 border: "none",
                 borderRadius: "5px",
@@ -628,7 +630,7 @@ const Dashboard = () => {
               style={{
                 width: "100%",
                 padding: "10px",
-                backgroundColor: "#701996",
+                backgroundColor: "#3A5474 ",
                 color: "white",
                 border: "none",
                 borderRadius: "5px",

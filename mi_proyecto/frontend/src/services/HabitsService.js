@@ -30,7 +30,7 @@ class HabitsService {
     try {
       const userId = localStorage.getItem("id");
       const response = await fetch(
-        `http://localhost:8000/api/progress_habit/?user_id=${userId}`,
+        `http://localhost:8000/api/progress_habit/?=${userId}`,
         {
           method: "GET",
           headers: {
