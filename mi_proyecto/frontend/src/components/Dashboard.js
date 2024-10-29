@@ -21,36 +21,55 @@ const Dashboard = () => {
   const [reminderMessage, setReminderMessage] = useState(""); // Nuevo estado para el mensaje
   const [habits, setHabits] = useState([]);
   const [notifications, setNotifications] = useState([]); 
-
+  
   const navigate = useNavigate(); // Hook para redirección
+  const [reminderFrequency, setReminderFrequency] = useState("Unica vez");
+  const [reminderDate, setReminderDate] = useState("");
 
   // Manejo de la creación de hábitos
   const handleHabitSubmit = (e) => {
     e.preventDefault();
     habitsActionCreator.createHabit(habitName, frequency, category, goal);
+
+    toast.success(`Hábito "${habitName}" creado con éxito!`);
+
+    setHabitName("");
+    setFrequency("Diario");
+    setCategory("Salud");
+    setGoal("Diario");
   };
 
-  const handleReminderSubmit = (e) => {
-    e.preventDefault();
+// Manejo de la creación de recordatorios
+const handleReminderSubmit = (e) => {
+  e.preventDefault();
 
-    const newNotification = {
-      message: `Recordatorio para las ${reminderTime}: ${reminderMessage}`,
-      time: reminderTime,
-      read: false,
-    };
-
-    setNotifications((prevNotifications) => [...prevNotifications, newNotification]);
-
-    toast.success(`Recordatorio creado para las ${reminderTime}`, {
-      position: "top-right",
-      autoClose: 5000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-    });
+  const newNotification = {
+    message: `Recordatorio: ${reminderMessage}`,
+    time: reminderTime,
+    date: reminderDate,
+    frequency: reminderFrequency,
+    read: false,
   };
+
+  setNotifications((prevNotifications) => [...prevNotifications, newNotification]);
+
+  toast.success(`Recordatorio creado para las ${reminderTime}`, {
+    position: "top-right",
+    autoClose: 5000,
+    hideProgressBar: false,
+    closeOnClick: true,
+    pauseOnHover: true,
+    draggable: true,
+    progress: undefined,
+  });
+
+  // Limpiar campos de recordatorio
+  setReminderMessage("");
+  setReminderTime("08:00");
+  setReminderDate("");
+  setReminderFrequency("Unica vez");
+};
+
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -431,64 +450,120 @@ const Dashboard = () => {
         }}
       >
       <h2 style={{ marginBottom: "15px", fontSize: "1.5rem", textAlign: "center", color: "#333" }}>
-            Recordatorios
-          </h2>
-          <form id="reminderForm" onSubmit={handleReminderSubmit}>
-            <div style={{ marginBottom: "15px" }}>
-              <label
-                htmlFor="reminderTime"
-                style={{
-                  fontWeight: "bold",
-                  marginBottom: "5px",
-                  display: "block",
-                }}
-              >
-              Hora del Recordatorio
-            </label>
-            <input
-              type="time"
-              id="reminderTime"
-              value={reminderTime}
-              onChange={(e) => setReminderTime(e.target.value)}
-              style={{
-                width: "100%",
-                padding: "10px",
-                marginTop: "5px",
-                borderRadius: "5px",
-                border: "1px solid #ddd",
-              }}
-            />
-          </div>
-          <div
-            style={{
-              marginBottom: "15px",
-            }}
-          >
-            <label
-              style={{
-                fontWeight: "bold",
-                marginBottom: "5px",
-                display: "block",
-              }}
-              htmlFor="reminderMessage"
-            >
-              Mensaje del Recordatorio
-            </label>
-            <input
-              type="text"
-              id="reminderMessage"
-              placeholder="Mensaje de recordatorio"
-              value={reminderMessage}
-              onChange={(e) => setReminderMessage(e.target.value)}
-              style={{
-                width: "100%",
-                padding: "10px",
-                marginTop: "5px",
-                borderRadius: "5px",
-                border: "1px solid #ddd",
-              }}
-            />
-          </div>
+    Recordatorios
+  </h2>
+  <form id="reminderForm" onSubmit={handleReminderSubmit}>
+    
+    {/* Campo de Frecuencia */}
+    <div style={{ marginBottom: "15px" }}>
+      <label
+        style={{
+          fontWeight: "bold",
+          marginBottom: "5px",
+          display: "block",
+        }}
+        htmlFor="reminderFrequency"
+      >
+        Frecuencia
+      </label>
+      <select
+        id="reminderFrequency"
+        value={reminderFrequency}
+        onChange={(e) => setReminderFrequency(e.target.value)}
+        style={{
+          width: "100%",
+          padding: "10px",
+          marginTop: "5px",
+          borderRadius: "5px",
+          border: "1px solid #ddd",
+        }}
+      >
+        <option value="Unica vez">Unica vez</option>
+        <option value="Diario">Diario</option>
+      </select>
+    </div>
+
+    {/* Campo de Fecha */}
+    <div style={{ marginBottom: "15px" }}>
+      <label
+        style={{
+          fontWeight: "bold",
+          marginBottom: "5px",
+          display: "block",
+        }}
+        htmlFor="reminderDate"
+      >
+        Fecha
+      </label>
+      <input
+        type="date"
+        id="reminderDate"
+        value={reminderDate}
+        onChange={(e) => setReminderDate(e.target.value)}
+        style={{
+          width: "100%",
+          padding: "10px",
+          marginTop: "5px",
+          borderRadius: "5px",
+          border: "1px solid #ddd",
+        }}
+      />
+    </div>
+
+    {/* Campo de Hora */}
+    <div style={{ marginBottom: "15px" }}>
+      <label
+        style={{
+          fontWeight: "bold",
+          marginBottom: "5px",
+          display: "block",
+        }}
+        htmlFor="reminderTime"
+      >
+        Hora del Recordatorio
+      </label>
+      <input
+        type="time"
+        id="reminderTime"
+        value={reminderTime}
+        onChange={(e) => setReminderTime(e.target.value)}
+        style={{
+          width: "100%",
+          padding: "10px",
+          marginTop: "5px",
+          borderRadius: "5px",
+          border: "1px solid #ddd",
+        }}
+      />
+    </div>
+
+    {/* Campo de Mensaje */}
+    <div style={{ marginBottom: "15px" }}>
+      <label
+        style={{
+          fontWeight: "bold",
+          marginBottom: "5px",
+          display: "block",
+        }}
+        htmlFor="reminderMessage"
+      >
+        Mensaje del Recordatorio
+      </label>
+      <input
+        type="text"
+        id="reminderMessage"
+        placeholder="Mensaje de recordatorio"
+        value={reminderMessage}
+        onChange={(e) => setReminderMessage(e.target.value)}
+        style={{
+          width: "100%",
+          padding: "10px",
+          marginTop: "5px",
+          borderRadius: "5px",
+          border: "1px solid #ddd",
+        }}
+      />
+    </div>
             <button
               style={{
                 width: "100%",
