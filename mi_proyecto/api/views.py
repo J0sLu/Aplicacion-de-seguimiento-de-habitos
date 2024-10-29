@@ -192,8 +192,10 @@ class ProgressHabitView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
+        key = request.headers.get('Authorization')
+        user_id = Token.objects.get(key=key).user_id
 
-        user_id = request.query_params.get('user_id')
+        #user_id = request.query_params.get('user_id')
         
         habitos = Habit.objects.filter(user_id=user_id)
         progresos = []  # Lista para almacenar los progresos de cada hábito
