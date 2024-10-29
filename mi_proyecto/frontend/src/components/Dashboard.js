@@ -9,7 +9,8 @@ import habitsActionCreator from "../action-creators/HabitsActionCreator";
 import authStore from "../stores/AuthStore";
 import habitsStore from "../stores/HabitStore";
 import ListGroup from "react-bootstrap/ListGroup";
-import  ProgressBar  from "react-bootstrap/ProgressBar";
+import ProgressBar from "react-bootstrap/ProgressBar";
+import Spinner from "react-bootstrap/Spinner";
 
 const Dashboard = () => {
   const [habitName, setHabitName] = useState("");
@@ -20,52 +21,57 @@ const Dashboard = () => {
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
   const [reminderMessage, setReminderMessage] = useState(""); // Nuevo estado para el mensaje
   const [habits, setHabits] = useState([]);
-  const [notifications, setNotifications] = useState([]); 
-  
+  const [notifications, setNotifications] = useState([]);
+
   const navigate = useNavigate(); // Hook para redirección
   const [reminderFrequency, setReminderFrequency] = useState("Unica vez");
   const [reminderDate, setReminderDate] = useState("");
+  const [isCreatingHabit, setIsCreatingHabit] = useState(
+    habitsStore.getIsCreating()
+  );
 
   // Manejo de la creación de hábitos
   const handleHabitSubmit = (e) => {
     e.preventDefault();
     habitsActionCreator.createHabit(habitName, frequency, category, goal);
     setHabitName("");
-    setFrequency("");
-    setCategory("");
+    setFrequency("Diario");
+    setCategory("Salud");
     setGoal("");
   };
 
   const handleReminderSubmit = (e) => {
     e.preventDefault();
 
-  const newNotification = {
-    message: `Recordatorio: ${reminderMessage}`,
-    time: reminderTime,
-    date: reminderDate,
-    frequency: reminderFrequency,
-    read: false,
+    const newNotification = {
+      message: `Recordatorio: ${reminderMessage}`,
+      time: reminderTime,
+      date: reminderDate,
+      frequency: reminderFrequency,
+      read: false,
+    };
+
+    setNotifications((prevNotifications) => [
+      ...prevNotifications,
+      newNotification,
+    ]);
+
+    toast.success(`Recordatorio creado para las ${reminderTime}`, {
+      position: "top-right",
+      autoClose: 5000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+    });
+
+    // Limpiar campos de recordatorio
+    setReminderMessage("");
+    setReminderTime("08:00");
+    setReminderDate("");
+    setReminderFrequency("Unica vez");
   };
-
-  setNotifications((prevNotifications) => [...prevNotifications, newNotification]);
-
-  toast.success(`Recordatorio creado para las ${reminderTime}`, {
-    position: "top-right",
-    autoClose: 5000,
-    hideProgressBar: false,
-    closeOnClick: true,
-    pauseOnHover: true,
-    draggable: true,
-    progress: undefined,
-  });
-
-  // Limpiar campos de recordatorio
-  setReminderMessage("");
-  setReminderTime("08:00");
-  setReminderDate("");
-  setReminderFrequency("Unica vez");
-};
-
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -119,10 +125,13 @@ const Dashboard = () => {
     };
 
     const fetchHabits = async () => {
-      setHabits(await habitsStore.getHabits());
+      setHabits(await habitsStore.fetchHabits());
     };
 
-    const handleHabitsChange = () => {};
+    const handleHabitsChange = () => {
+      setIsCreatingHabit(habitsStore.getIsCreating());
+      fetchHabits();
+    };
 
     fetchHabits();
 
@@ -193,7 +202,9 @@ const Dashboard = () => {
               </Dropdown.Toggle>
               <Dropdown.Menu>
                 {notifications.map((notification, index) => (
-                  <Dropdown.Item key={index}>{notification.message}</Dropdown.Item>
+                  <Dropdown.Item key={index}>
+                    {notification.message}
+                  </Dropdown.Item>
                 ))}
               </Dropdown.Menu>
             </Dropdown>
@@ -221,346 +232,371 @@ const Dashboard = () => {
           padding: "20px",
         }}
       >
-      {/* Lista de habitos */}
-      <ListGroup as="ul">
-        <ListGroup.Item as="li" active>
-          Habitos
-        </ListGroup.Item>
-        {habits.map((habit) => {
-          const progressPercentage = habit.progress * 100;
-          console.log(habit);
-          return <ListGroup.Item as="li">
-            <div>{habit.name}</div>
-            
-            <div>Frecuencia: {habit.frequency}</div>
-            <div>Categoría: {habit.category}</div>
-            <div>Objetivo: {habit.target}</div>
-            
-            <ProgressBar now={progressPercentage} label={`${progressPercentage}%`} />
-          </ListGroup.Item>;
-        })}
-      </ListGroup>
+        {/* Lista de habitos */}
+        <ListGroup as="ul">
+          <ListGroup.Item as="li" active>
+            Habitos
+          </ListGroup.Item>
+          {habits.map((habit) => {
+            const progressPercentage = habit.progress * 100;
+            console.log(habit);
+            return (
+              <ListGroup.Item as="li">
+                <div>{habit.name}</div>
 
-      {/* Creación de hábitos */}
-      <div
-        className="habit-form-container"
-        style={{
-          backgroundColor: "#fff",
-          padding: "20px",
-          borderRadius: "10px",
-          boxShadow: "0px 5px 10px rgba(0, 0, 0, 0.1)",
-        }}
-      >
-        <h2
+                <div>Frecuencia: {habit.frequency}</div>
+                <div>Categoría: {habit.category}</div>
+                <div>Objetivo: {habit.target}</div>
+
+                <ProgressBar
+                  now={progressPercentage}
+                  label={`${progressPercentage}%`}
+                />
+              </ListGroup.Item>
+            );
+          })}
+        </ListGroup>
+
+        {/* Creación de hábitos */}
+        <div
+          className="habit-form-container"
           style={{
-            marginBottom: "15px",
-            fontSize: "1.5rem",
-            textAlign: "center",
-            color: "#333",
+            backgroundColor: "#fff",
+            padding: "20px",
+            borderRadius: "10px",
+            boxShadow: "0px 5px 10px rgba(0, 0, 0, 0.1)",
           }}
         >
-          Crear Hábito
-        </h2>
-        <form id="habitForm" onSubmit={handleHabitSubmit}>
-          <div
+          <h2
             style={{
               marginBottom: "15px",
+              fontSize: "1.5rem",
+              textAlign: "center",
+              color: "#333",
             }}
           >
-            <label
+            Crear Hábito
+          </h2>
+          <form id="habitForm" onSubmit={handleHabitSubmit}>
+            <div
               style={{
-                fontWeight: "bold",
-                marginBottom: "5px",
-                display: "block",
+                marginBottom: "15px",
               }}
-              htmlFor="habitName"
             >
-              Nombre del Hábito
-            </label>
-            <input
-              type="text"
-              id="habitName"
-              placeholder="Ej. Leer, Meditar"
-              value={habitName}
-              onChange={(e) => setHabitName(e.target.value)}
-              required
+              <label
+                style={{
+                  fontWeight: "bold",
+                  marginBottom: "5px",
+                  display: "block",
+                }}
+                htmlFor="habitName"
+              >
+                Nombre del Hábito
+              </label>
+              <input
+                type="text"
+                id="habitName"
+                placeholder="Ej. Leer, Meditar"
+                value={habitName}
+                onChange={(e) => setHabitName(e.target.value)}
+                required
+                style={{
+                  width: "100%",
+                  padding: "10px",
+                  marginTop: "5px",
+                  borderRadius: "5px",
+                  border: "1px solid #ddd",
+                }}
+              />
+            </div>
+            <div
+              style={{
+                marginBottom: "15px",
+              }}
+            >
+              <label
+                style={{
+                  fontWeight: "bold",
+                  marginBottom: "5px",
+                  display: "block",
+                }}
+                htmlFor="frequency"
+              >
+                Frecuencia
+              </label>
+              <select
+                id="frequency"
+                value={frequency}
+                onChange={(e) => setFrequency(e.target.value)}
+                style={{
+                  width: "100%",
+                  padding: "10px",
+                  marginTop: "5px",
+                  borderRadius: "5px",
+                  border: "1px solid #ddd",
+                }}
+              >
+                <option value="Diario">Diario</option>
+                <option value="Semanal">Semanal</option>
+                <option value="Mensual">Mensual</option>
+              </select>
+            </div>
+            <div
+              style={{
+                marginBottom: "15px",
+              }}
+            >
+              <label
+                style={{
+                  fontWeight: "bold",
+                  marginBottom: "5px",
+                  display: "block",
+                }}
+                htmlFor="category"
+              >
+                Categoría
+              </label>
+              <select
+                id="category"
+                value={category}
+                onChange={(e) => setCategory(e.target.value)}
+                style={{
+                  width: "100%",
+                  padding: "10px",
+                  marginTop: "5px",
+                  borderRadius: "5px",
+                  border: "1px solid #ddd",
+                }}
+              >
+                <option value="Salud">Salud</option>
+                <option value="Productividad">Productividad</option>
+                <option value="Personal">Personal</option>
+              </select>
+            </div>
+            <div
+              style={{
+                marginBottom: "15px",
+                width: "100%",
+              }}
+            >
+              <label
+                style={{
+                  fontWeight: "bold",
+                  marginBottom: "5px",
+                  display: "block",
+                }}
+                htmlFor="goal"
+              >
+                Objetivo
+              </label>
+              <input
+                type="number"
+                id="goal"
+                value={goal}
+                min="0"
+                max="100"
+                onChange={(e) => setGoal(e.target.value)}
+                style={{
+                  width: "100%",
+                  padding: "10px",
+                  marginTop: "5px",
+                  borderRadius: "5px",
+                  border: "1px solid #ddd",
+                }}
+              />
+            </div>
+            <button
               style={{
                 width: "100%",
                 padding: "10px",
-                marginTop: "5px",
+                backgroundColor: "#701996",
+                color: "white",
+                border: "none",
                 borderRadius: "5px",
-                border: "1px solid #ddd",
+                cursor: "pointer",
+                fontSize: "1rem",
               }}
-            />
-          </div>
-          <div
-            style={{
-              marginBottom: "15px",
-            }}
-          >
-            <label
-              style={{
-                fontWeight: "bold",
-                marginBottom: "5px",
-                display: "block",
-              }}
-              htmlFor="frequency"
+              type="submit"
             >
-              Frecuencia
-            </label>
-            <select
-              id="frequency"
-              value={frequency}
-              onChange={(e) => setFrequency(e.target.value)}
-              style={{
-                width: "100%",
-                padding: "10px",
-                marginTop: "5px",
-                borderRadius: "5px",
-                border: "1px solid #ddd",
-              }}
-            >
-              <option value="Diario">Diario</option>
-              <option value="Semanal">Semanal</option>
-              <option value="Mensual">Mensual</option>
-            </select>
-          </div>
-          <div
-            style={{
-              marginBottom: "15px",
-            }}
-          >
-            <label
-              style={{
-                fontWeight: "bold",
-                marginBottom: "5px",
-                display: "block",
-              }}
-              htmlFor="category"
-            >
-              Categoría
-            </label>
-            <select
-              id="category"
-              value={category}
-              onChange={(e) => setCategory(e.target.value)}
-              style={{
-                width: "100%",
-                padding: "10px",
-                marginTop: "5px",
-                borderRadius: "5px",
-                border: "1px solid #ddd",
-              }}
-            >
-              <option value="Salud">Salud</option>
-              <option value="Productividad">Productividad</option>
-              <option value="Personal">Personal</option>
-            </select>
-          </div>
-          <div
-            style={{
-              marginBottom: "15px",
-              width: "100%",
-            }}
-          >
-            <label
-              style={{
-                fontWeight: "bold",
-                marginBottom: "5px",
-                display: "block",
-              }}
-              htmlFor="goal"
-            >
-              Objetivo
-            </label>
-            <input
-              type="number"
-              id="goal"
-              value={goal}
-              min="0"
-              max="100"
-              onChange={(e) => setGoal(e.target.value)}
-              style={{
-                width: "100%",
-                padding: "10px",
-                marginTop: "5px",
-                borderRadius: "5px",
-                border: "1px solid #ddd",
-              }}
-            />
-          </div>
-          <button
-            style={{
-              width: "100%",
-              padding: "10px",
-              backgroundColor: "#701996",
-              color: "white",
-              border: "none",
-              borderRadius: "5px",
-              cursor: "pointer",
-              fontSize: "1rem",
-            }}
-            type="submit"
-          >
-            Agregar Hábito
-          </button>
-        </form>
-      </div>
+              {isCreatingHabit ? (
+                <>
+                  <Spinner
+                    as="span"
+                    animation="border"
+                    size="sm"
+                    role="status"
+                    aria-hidden="true"
+                    style={{ marginRight: "10px" }}
+                  />
+                  Creando...
+                </>
+              ) : (
+                "Agregar Hábito"
+              )}
+            </button>
+          </form>
+        </div>
 
-      {/* Visualización del progreso */}
-      <div
-        className="progress-view-container"
-        style={{
-          backgroundColor: "#fff",
-          padding: "20px",
-          borderRadius: "10px",
-          boxShadow: "0px 5px 10px rgba(0, 0, 0, 0.1)",
-        }}
-      >
-        <h2
+        {/* Visualización del progreso */}
+        <div
+          className="progress-view-container"
           style={{
-            marginBottom: "15px",
-            fontSize: "1.5rem",
-            textAlign: "center",
-            color: "#333",
+            backgroundColor: "#fff",
+            padding: "20px",
+            borderRadius: "10px",
+            boxShadow: "0px 5px 10px rgba(0, 0, 0, 0.1)",
           }}
         >
-          Progreso de Hábitos
-        </h2>
-        <canvas
+          <h2
+            style={{
+              marginBottom: "15px",
+              fontSize: "1.5rem",
+              textAlign: "center",
+              color: "#333",
+            }}
+          >
+            Progreso de Hábitos
+          </h2>
+          <canvas
+            style={{
+              maxWidth: "100%",
+              height: "auto",
+            }}
+            id="habitProgressChart"
+          ></canvas>
+        </div>
+
+        {/* Recordatorios y notificaciones */}
+        <div
+          className="reminder-settings-container"
           style={{
-            maxWidth: "100%",
-            height: "auto",
+            backgroundColor: "#fff",
+            padding: "20px",
+            borderRadius: "10px",
+            boxShadow: "0px 5px 10px rgba(0, 0, 0, 0.1)",
           }}
-          id="habitProgressChart"
-        ></canvas>
-      </div>
+        >
+          <h2
+            style={{
+              marginBottom: "15px",
+              fontSize: "1.5rem",
+              textAlign: "center",
+              color: "#333",
+            }}
+          >
+            Recordatorios
+          </h2>
+          <form id="reminderForm" onSubmit={handleReminderSubmit}>
+            {/* Campo de Frecuencia */}
+            <div style={{ marginBottom: "15px" }}>
+              <label
+                style={{
+                  fontWeight: "bold",
+                  marginBottom: "5px",
+                  display: "block",
+                }}
+                htmlFor="reminderFrequency"
+              >
+                Frecuencia
+              </label>
+              <select
+                id="reminderFrequency"
+                value={reminderFrequency}
+                onChange={(e) => setReminderFrequency(e.target.value)}
+                style={{
+                  width: "100%",
+                  padding: "10px",
+                  marginTop: "5px",
+                  borderRadius: "5px",
+                  border: "1px solid #ddd",
+                }}
+              >
+                <option value="Unica vez">Unica vez</option>
+                <option value="Diario">Diario</option>
+              </select>
+            </div>
 
-      {/* Recordatorios y notificaciones */}
-      <div
-        className="reminder-settings-container"
-        style={{
-          backgroundColor: "#fff",
-          padding: "20px",
-          borderRadius: "10px",
-          boxShadow: "0px 5px 10px rgba(0, 0, 0, 0.1)",
-        }}
-      >
-      <h2 style={{ marginBottom: "15px", fontSize: "1.5rem", textAlign: "center", color: "#333" }}>
-    Recordatorios
-  </h2>
-  <form id="reminderForm" onSubmit={handleReminderSubmit}>
-    
-    {/* Campo de Frecuencia */}
-    <div style={{ marginBottom: "15px" }}>
-      <label
-        style={{
-          fontWeight: "bold",
-          marginBottom: "5px",
-          display: "block",
-        }}
-        htmlFor="reminderFrequency"
-      >
-        Frecuencia
-      </label>
-      <select
-        id="reminderFrequency"
-        value={reminderFrequency}
-        onChange={(e) => setReminderFrequency(e.target.value)}
-        style={{
-          width: "100%",
-          padding: "10px",
-          marginTop: "5px",
-          borderRadius: "5px",
-          border: "1px solid #ddd",
-        }}
-      >
-        <option value="Unica vez">Unica vez</option>
-        <option value="Diario">Diario</option>
-      </select>
-    </div>
+            {/* Campo de Fecha */}
+            <div style={{ marginBottom: "15px" }}>
+              <label
+                style={{
+                  fontWeight: "bold",
+                  marginBottom: "5px",
+                  display: "block",
+                }}
+                htmlFor="reminderDate"
+              >
+                Fecha
+              </label>
+              <input
+                type="date"
+                id="reminderDate"
+                value={reminderDate}
+                onChange={(e) => setReminderDate(e.target.value)}
+                style={{
+                  width: "100%",
+                  padding: "10px",
+                  marginTop: "5px",
+                  borderRadius: "5px",
+                  border: "1px solid #ddd",
+                }}
+              />
+            </div>
 
-    {/* Campo de Fecha */}
-    <div style={{ marginBottom: "15px" }}>
-      <label
-        style={{
-          fontWeight: "bold",
-          marginBottom: "5px",
-          display: "block",
-        }}
-        htmlFor="reminderDate"
-      >
-        Fecha
-      </label>
-      <input
-        type="date"
-        id="reminderDate"
-        value={reminderDate}
-        onChange={(e) => setReminderDate(e.target.value)}
-        style={{
-          width: "100%",
-          padding: "10px",
-          marginTop: "5px",
-          borderRadius: "5px",
-          border: "1px solid #ddd",
-        }}
-      />
-    </div>
+            {/* Campo de Hora */}
+            <div style={{ marginBottom: "15px" }}>
+              <label
+                style={{
+                  fontWeight: "bold",
+                  marginBottom: "5px",
+                  display: "block",
+                }}
+                htmlFor="reminderTime"
+              >
+                Hora del Recordatorio
+              </label>
+              <input
+                type="time"
+                id="reminderTime"
+                value={reminderTime}
+                onChange={(e) => setReminderTime(e.target.value)}
+                style={{
+                  width: "100%",
+                  padding: "10px",
+                  marginTop: "5px",
+                  borderRadius: "5px",
+                  border: "1px solid #ddd",
+                }}
+              />
+            </div>
 
-    {/* Campo de Hora */}
-    <div style={{ marginBottom: "15px" }}>
-      <label
-        style={{
-          fontWeight: "bold",
-          marginBottom: "5px",
-          display: "block",
-        }}
-        htmlFor="reminderTime"
-      >
-        Hora del Recordatorio
-      </label>
-      <input
-        type="time"
-        id="reminderTime"
-        value={reminderTime}
-        onChange={(e) => setReminderTime(e.target.value)}
-        style={{
-          width: "100%",
-          padding: "10px",
-          marginTop: "5px",
-          borderRadius: "5px",
-          border: "1px solid #ddd",
-        }}
-      />
-    </div>
-
-    {/* Campo de Mensaje */}
-    <div style={{ marginBottom: "15px" }}>
-      <label
-        style={{
-          fontWeight: "bold",
-          marginBottom: "5px",
-          display: "block",
-        }}
-        htmlFor="reminderMessage"
-      >
-        Mensaje del Recordatorio
-      </label>
-      <input
-        type="text"
-        id="reminderMessage"
-        placeholder="Mensaje de recordatorio"
-        value={reminderMessage}
-        onChange={(e) => setReminderMessage(e.target.value)}
-        style={{
-          width: "100%",
-          padding: "10px",
-          marginTop: "5px",
-          borderRadius: "5px",
-          border: "1px solid #ddd",
-        }}
-      />
-    </div>
+            {/* Campo de Mensaje */}
+            <div style={{ marginBottom: "15px" }}>
+              <label
+                style={{
+                  fontWeight: "bold",
+                  marginBottom: "5px",
+                  display: "block",
+                }}
+                htmlFor="reminderMessage"
+              >
+                Mensaje del Recordatorio
+              </label>
+              <input
+                type="text"
+                id="reminderMessage"
+                placeholder="Mensaje de recordatorio"
+                value={reminderMessage}
+                onChange={(e) => setReminderMessage(e.target.value)}
+                style={{
+                  width: "100%",
+                  padding: "10px",
+                  marginTop: "5px",
+                  borderRadius: "5px",
+                  border: "1px solid #ddd",
+                }}
+              />
+            </div>
             <button
               style={{
                 width: "100%",

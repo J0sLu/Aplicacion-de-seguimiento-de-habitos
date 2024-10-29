@@ -2,14 +2,14 @@ import { EventEmitter } from "events";
 import dispatcher from "../dispatcher/Dispatcher";
 import { ACTION_TYPE } from "../constants/AppConstants";
 import habitsService from "../services/HabitsService";
-import { ToastContainer, toast } from "react-toastify";
+import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-
 
 class HabitsStore extends EventEmitter {
   constructor() {
     super();
     this.habits = [];
+    this.isCreating = false;
   }
 
   emitChange() {
@@ -27,10 +27,10 @@ class HabitsStore extends EventEmitter {
   handleAction(action) {
     switch (action.type) {
       case ACTION_TYPE.CREATE_HABIT:
-        this.handleCreateHabit(action.habit);
+        this.handleCreateHabit();
         break;
       case ACTION_TYPE.CREATE_HABIT_SUCCEEDED:
-        this.handleCreateHabitSucceded(action.habit);
+        this.handleCreateHabitSucceded();
         break;
       case ACTION_TYPE.CREATE_HABIT_FAILED:
         this.handleCreateHabitFailed();
@@ -39,23 +39,21 @@ class HabitsStore extends EventEmitter {
     }
   }
 
-  handleCreateHabit(habit) {
-    this.habits.push(habit);
+  handleCreateHabit() {
+    this.isCreating = true;
     this.emitChange();
   }
 
-  handleCreateHabitSucceded(habit) {
-    this.habits.pop();
-    this.habits.push(habit);
-    this.emitChange();
+  handleCreateHabitSucceded() {
     toast.success("Hábito creado exitosamente");
-    
+    this.isCreating = false;
+    this.emitChange();
   }
 
   handleCreateHabitFailed() {
-    this.habits.pop();
-    this.emitChange();
     toast.error("Ya existe un hábito con ese nombre");
+    this.isCreating = false;
+    this.emitChange();
   }
 
   async fetchHabits() {
@@ -64,10 +62,8 @@ class HabitsStore extends EventEmitter {
     return this.habits;
   }
 
-  async getHabits() {
-    this.habits = await habitsService.fetchHabits(4);
-    console.log(this.habits);
-    return this.habits;
+  getIsCreating() {
+    return this.isCreating;
   }
 }
 

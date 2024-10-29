@@ -8,9 +8,7 @@ import habitsService from "../services/HabitsService";
 
 class HabitsActionCreator {
   async createHabit(name, frequency, category, target) {
-    dispatcher.dispatch(
-      CreateHabitAction({ name, frequency, category, target })
-    );
+    dispatcher.dispatch(CreateHabitAction);
     const createdHabit = await habitsService.createHabit(
       name,
       frequency,
@@ -18,9 +16,8 @@ class HabitsActionCreator {
       target
     );
 
-    console.log(createdHabit);
     if (createdHabit) {
-      dispatcher.dispatch(CreateHabitSuccededAction(createdHabit));
+      dispatcher.dispatch(CreateHabitSuccededAction);
     } else {
       dispatcher.dispatch(CreateHabitFailedAction);
     }

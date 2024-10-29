@@ -1,14 +1,12 @@
 import { ACTION_TYPE } from "../../constants/AppConstants";
 
-export const CreateHabitAction = (habit) => ({
+export const CreateHabitAction = {
   type: ACTION_TYPE.CREATE_HABIT,
-  habit,
-});
+};
 
-export const CreateHabitSuccededAction = (habit) => ({
+export const CreateHabitSuccededAction = {
   type: ACTION_TYPE.CREATE_HABIT_SUCCEEDED,
-  habit,
-});
+};
 
 export const CreateHabitFailedAction = {
   type: ACTION_TYPE.CREATE_HABIT_FAILED,
