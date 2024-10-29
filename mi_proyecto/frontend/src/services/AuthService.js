@@ -16,8 +16,7 @@ class AuthService {
         throw new Error("Credenciales incorrectas o error en el servidor");
       }
 
-      const data = await response.json();
-      return data.exists;
+      return await response.json();
     } catch (e) {
       return false;
     }

@@ -239,7 +239,6 @@ const Dashboard = () => {
           </ListGroup.Item>
           {habits.map((habit) => {
             const progressPercentage = habit.progress * 100;
-            console.log(habit);
             return (
               <ListGroup.Item as="li">
                 <div>{habit.name}</div>

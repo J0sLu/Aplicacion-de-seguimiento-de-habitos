@@ -13,8 +13,14 @@ import authService from "../services/AuthService";
 class AuthActionCreator {
   async login(username, password) {
     dispatcher.dispatch(LoginAction);
-    const isLogedIn = await authService.login(username, password);
-    dispatcher.dispatch(isLogedIn ? LoginSuccededAction : LoginFailedAction);
+    const response = await authService.login(username, password);
+    if (response.exists) {
+      dispatcher.dispatch(LoginSuccededAction);
+      localStorage.setItem("id", response.id);
+      localStorage.setItem("user", response.username);
+    } else {
+      dispatcher.dispatch(LoginFailedAction);
+    }
   }
 
   async signup(username, email, password) {

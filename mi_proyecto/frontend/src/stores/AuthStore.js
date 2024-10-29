@@ -7,7 +7,7 @@ class AuthStore extends EventEmitter {
   constructor() {
     super();
     this.isLoading = false;
-    this.isLogedIn = false;
+    this.isLoggedIn = false;
     this.showError = false;
     this.didSignUp = false;
   }
@@ -59,12 +59,12 @@ class AuthStore extends EventEmitter {
       position: toast.POSITION.TOP_RIGHT,
     });
     this.isLoading = this.showError = false;
-    this.isLogedIn = true;
+    this.isLoggedIn = true;
     this.emitChange();
   }
 
   handleLoginFailed() {
-    this.isLoading = this.isLogedIn = false;
+    this.isLoading = this.isLoggedIn = false;
     this.showError = true;
     this.emitChange();
   }
@@ -79,14 +79,14 @@ class AuthStore extends EventEmitter {
   }
 
   handleSignupFailed() {
-    this.isLoading = this.isLogedIn = false;
+    this.isLoading = this.isLoggedIn = false;
     this.showError = true;
     this.emitChange();
   }
 
   handleLogout() {
     // Nueva función para manejar el logout
-    this.isLogedIn = false;
+    this.isLoggedIn = false;
     this.emitChange();
   }
 
@@ -95,7 +95,7 @@ class AuthStore extends EventEmitter {
   }
 
   getIsLoggedIn() {
-    return this.isLogedIn;
+    return this.isLoggedIn;
   }
 
   getShowError() {

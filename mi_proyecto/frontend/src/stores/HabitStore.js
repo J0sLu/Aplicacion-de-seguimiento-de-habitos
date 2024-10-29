@@ -51,14 +51,15 @@ class HabitsStore extends EventEmitter {
   }
 
   handleCreateHabitFailed() {
-    toast.error("Ya existe un hábito con ese nombre");
+    toast.error(
+      "Algo salio mal creando el habito, intenta de nuevo sin repetir el nombre"
+    );
     this.isCreating = false;
     this.emitChange();
   }
 
   async fetchHabits() {
-    this.habits = await habitsService.fetchHabits(4);
-    console.log(this.habits);
+    this.habits = await habitsService.fetchHabits();
     return this.habits;
   }
 
