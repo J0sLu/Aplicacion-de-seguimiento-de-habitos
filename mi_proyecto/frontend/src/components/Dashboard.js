@@ -231,7 +231,6 @@ const Dashboard = () => {
           console.log(habit);
           return <ListGroup.Item as="li">
             <div>{habit.name}</div>
-            
             <div>Frecuencia: {habit.frequency}</div>
             <div>Categoría: {habit.category}</div>
             <div>Objetivo: {habit.target}</div>

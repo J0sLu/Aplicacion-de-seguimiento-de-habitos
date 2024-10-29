@@ -3,7 +3,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import viewsets
 from rest_framework import status
-from .models import User, Habit, Progress, Notification, Reward
+from .models import User, Habit, Progress, Notification, Reward,Token
 from .serializers import UserSerializer, HabitSerializer, ProgressSerializer, NotificationSerializer, RewardSerializer
 from django.contrib.auth.hashers import make_password
 from django.http import HttpResponse
@@ -11,6 +11,8 @@ from django.shortcuts import redirect  # Para redirigir en la vista home_view
 from django.utils import timezone  # Importar la zona horaria de Django
 from datetime import timedelta,datetime  # Importar timedelta para sumar o restar días a una fecha
 from django.utils.dateparse import parse_date
+
+import secrets
 
 """ 
 @api_view(['GET'])
@@ -34,23 +36,48 @@ class VerifyUserView(APIView):
         
         try:
             user = User.objects.get(email=email)
+            print(user)
             
             if user.check_password(password):  # Verifica la contraseña
                 return Response({
                     "exists": True,
                     "id": user.id,
                     "username": user.username,
+                    "token": user.token.key,
                     }, status=status.HTTP_200_OK)
             else:
                 return Response({"exists 01": False}, status=status.HTTP_200_OK)
         except User.DoesNotExist:
             return Response({"exists 02": False}, status=status.HTTP_200_OK)
 
+class UserLoginView(APIView):
+    def post(self, request):
+        email = request.data.get('email')
+        password = request.data.get('password')
+        try:
+            user = User.objects.get(email=email)
+            if user.check_password(password):
+                token, created = Token.objects.get_or_create(user=user)
+                return Response({
+                    "exists": True,
+                    "username": user.username,
+                    'token': token.key
+                    }, status=status.HTTP_200_OK)
+            else:
+                return Response({'error': 'Invalid credentials'}, status=status.HTTP_400_BAD_REQUEST)
+        except User.DoesNotExist:
+            return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
+
+
+
 # Vistas para el modelo User
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
 
+
+def generate_token():
+    return secrets.token_hex(20)
 class UserCreateView(APIView):
     def post(self, request):
         data = request.data
@@ -62,8 +89,13 @@ class UserCreateView(APIView):
         serializer = UserSerializer(data=data)
         
         if serializer.is_valid():
-            serializer.save()
-            return Response( status=status.HTTP_201_CREATED)  # Código HTTP 201
+            user = serializer.save()
+            
+            # Generar y guardar el token
+            token_key = generate_token()
+            Token.objects.create(user=user, key=token_key)
+            
+            return Response({'token': token_key}, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 # Vistas para el modelo Habit

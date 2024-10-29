@@ -1,5 +1,8 @@
 from django.db import models
 from django.contrib.auth.hashers import make_password, check_password
+from django.utils import timezone
+
+
 class User(models.Model):
     id = models.BigAutoField(primary_key=True)
     username = models.TextField()
@@ -20,6 +23,14 @@ class User(models.Model):
         # Verifica la contraseña proporcionada con el hash almacenado
         return check_password(raw_password, self.password)
     
+class Token(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    key = models.CharField(max_length=40, primary_key=True)
+    created_at = models.DateTimeField(default=timezone.now)
+
+    def __str__(self):
+        return f'Token for {self.user.username}'
+    
     
 class Habit(models.Model):
     FREQUENCY_CHOICES = [
@@ -32,7 +43,7 @@ class Habit(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='habits')
     name = models.TextField()
     start_date = models.DateField()
-    category = models.TextField()
+    #category = models.TextField()
     frequency = models.CharField(max_length=10, choices=FREQUENCY_CHOICES)
     target = models.IntegerField()
     created_at = models.DateTimeField(auto_now_add=True)
