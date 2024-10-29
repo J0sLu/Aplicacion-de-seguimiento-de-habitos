@@ -1,6 +1,7 @@
 import { EventEmitter } from "events";
 import dispatcher from "../dispatcher/Dispatcher";
 import { ACTION_TYPE } from "../constants/AppConstants";
+import { toast } from "react-toastify";
 
 class AuthStore extends EventEmitter {
   constructor() {
@@ -8,6 +9,7 @@ class AuthStore extends EventEmitter {
     this.isLoading = false;
     this.isLogedIn = false;
     this.showError = false;
+    this.didSignUp = false;
   }
 
   emitChange() {
@@ -53,6 +55,9 @@ class AuthStore extends EventEmitter {
   }
 
   handleLoginSucceeded() {
+    toast.success("¡Inicio de sesión exitoso!", {
+      position: toast.POSITION.TOP_RIGHT,
+    });
     this.isLoading = this.showError = false;
     this.isLogedIn = true;
     this.emitChange();
@@ -65,7 +70,11 @@ class AuthStore extends EventEmitter {
   }
 
   handleSignupSucceeded() {
+    toast.success("¡Registro de usuario exitoso!", {
+      position: toast.POSITION.TOP_RIGHT,
+    });
     this.isLoading = false;
+    this.didSignUp = true;
     this.emitChange();
   }
 
@@ -91,6 +100,10 @@ class AuthStore extends EventEmitter {
 
   getShowError() {
     return this.showError;
+  }
+
+  getDidSignUp() {
+    return this.didSignUp;
   }
 }
 

@@ -5,7 +5,6 @@ import Button from "react-bootstrap/Button";
 import { Navigate } from "react-router-dom";
 import Spinner from "react-bootstrap/Spinner";
 import Alert from "react-bootstrap/Alert";
-import { toast } from "react-toastify";
 
 const Login = (props) => {
   const { onLogin, onSignup, authStore } = props;
@@ -22,10 +21,8 @@ const Login = (props) => {
       setIsLoggedIn(authStore.getIsLoggedIn());
       setIsLoading(authStore.getIsLoading());
       setShowError(authStore.getShowError());
-
-      // pop de éxito cuando el login sea exitoso
-      if (authStore.getIsLoggedIn()) {
-        toast.success("¡Inicio de sesión exitoso!", { position: toast.POSITION.TOP_RIGHT });
+      if (authStore.getDidSignUp()) {
+        setIsLoggingIn(true);
       }
     };
 
