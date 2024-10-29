@@ -28,6 +28,10 @@ const Dashboard = () => {
   const handleHabitSubmit = (e) => {
     e.preventDefault();
     habitsActionCreator.createHabit(habitName, frequency, category, goal);
+    setHabitName("");
+    setFrequency("");
+    setCategory("");
+    setGoal("");
   };
 
   const handleReminderSubmit = (e) => {
@@ -216,10 +220,11 @@ const Dashboard = () => {
           console.log(habit);
           return <ListGroup.Item as="li">
             <div>{habit.name}</div>
+            
             <div>Frecuencia: {habit.frequency}</div>
             <div>Categoría: {habit.category}</div>
             <div>Objetivo: {habit.target}</div>
-            <div>Progreso: {habit.times}</div>
+            
             <ProgressBar now={progressPercentage} label={`${progressPercentage}%`} />
           </ListGroup.Item>;
         })}

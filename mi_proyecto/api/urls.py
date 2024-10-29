@@ -28,7 +28,8 @@ urlpatterns = [
     path('api/progress_month/', ProgressUserDateView.as_view()),  # Cambia a esta línea
     path('api/progress_week/', ProgressCurrentWeek.as_view()),  # Cambia a esta línea
     path('api/progress_habit/', ProgressHabitView.as_view()),  # Cambia a esta línea
-    path('api/not_change/', NotifyChangeStatus.as_view())
+    path('api/not_change/', NotifyChangeStatus.as_view()),
+    path('api/habit_erase/', HabitEraseView.as_view())
 
     
 ]

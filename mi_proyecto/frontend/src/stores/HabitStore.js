@@ -2,6 +2,9 @@ import { EventEmitter } from "events";
 import dispatcher from "../dispatcher/Dispatcher";
 import { ACTION_TYPE } from "../constants/AppConstants";
 import habitsService from "../services/HabitsService";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
 
 class HabitsStore extends EventEmitter {
   constructor() {
@@ -45,11 +48,14 @@ class HabitsStore extends EventEmitter {
     this.habits.pop();
     this.habits.push(habit);
     this.emitChange();
+    toast.success("Hábito creado exitosamente");
+    
   }
 
   handleCreateHabitFailed() {
     this.habits.pop();
     this.emitChange();
+    toast.error("Ya existe un hábito con ese nombre");
   }
 
   async fetchHabits() {
