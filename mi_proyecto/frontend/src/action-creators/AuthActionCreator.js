@@ -16,7 +16,6 @@ class AuthActionCreator {
     const response = await authService.login(username, password);
     if (response.exists) {
       dispatcher.dispatch(LoginSuccededAction);
-      localStorage.setItem("id", response.id);
       localStorage.setItem("user", response.username);
       localStorage.setItem("token", response.token);
     } else {
