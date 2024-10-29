@@ -233,29 +233,43 @@ const Dashboard = () => {
         }}
       >
         {/* Lista de habitos */}
-        <ListGroup as="ul">
-          <ListGroup.Item as="li" active>
-            Habitos
-          </ListGroup.Item>
-          {habits.map((habit) => {
-            const progressPercentage = habit.progress * 100;
-            console.log(habit);
-            return (
-              <ListGroup.Item as="li">
-                <div>{habit.name}</div>
+      <ListGroup as="ul">
+        <ListGroup.Item as="li" active>
+          Habitos
+        </ListGroup.Item>
+        {habits.map((habit) => {
+          const progressPercentage = habit.progress * 100;
+          console.log(habit);
+          return <ListGroup.Item as="li">
+            <h5>{habit.name}</h5>  {/* Encabezado con el nombre del hábito */}
+        
+        <ProgressBar now={progressPercentage} label={`${progressPercentage}%`} style={{
+          backgroundColor: "#f8d7da",
+        }} />
 
-                <div>Frecuencia: {habit.frequency}</div>
-                <div>Categoría: {habit.category}</div>
-                <div>Objetivo: {habit.target}</div>
-
-                <ProgressBar
-                  now={progressPercentage}
-                  label={`${progressPercentage}%`}
-                />
-              </ListGroup.Item>
-            );
-          })}
-        </ListGroup>
+        <div className="d-flex justify-content-between align-items-center mt-2">
+          <div>Frecuencia: {habit.frequency}</div>
+          <div>Categoría: {habit.category}</div>
+          <div>Objetivo: {habit.target}</div>
+        </div>
+        <div className="d-flex justify-content-between align-items-center mt-2">
+        <button 
+          className="btn btn-success mt-2" 
+          // Asegúrate de implementar la función handleDeleteHabit
+        >
+          Marcar progreso
+        </button>
+        
+        <button 
+          className="btn btn-danger mt-2" 
+          // Asegúrate de implementar la función handleDeleteHabit
+        >
+          Eliminar Hábito
+        </button>
+        </div>
+          </ListGroup.Item>;
+        })}
+      </ListGroup>
 
         {/* Creación de hábitos */}
         <div
