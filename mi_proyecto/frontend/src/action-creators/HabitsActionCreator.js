@@ -38,6 +38,7 @@ class HabitsActionCreator {
 
   async updateProgress(id) {
     const didUpdate = await habitsService.updateProgress(id);
+    console.log(didUpdate);
     if (didUpdate) {
       dispatcher.dispatch(UpdateProgressSucceededAction);
     } else {

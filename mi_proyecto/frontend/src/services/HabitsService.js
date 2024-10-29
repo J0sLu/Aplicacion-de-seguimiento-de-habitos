@@ -77,7 +77,7 @@ class HabitsService {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            habit_id: id,
+            habit: id,
           }),
         }
       );

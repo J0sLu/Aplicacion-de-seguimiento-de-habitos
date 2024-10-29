@@ -41,6 +41,12 @@ class HabitsStore extends EventEmitter {
       case ACTION_TYPE.DELETE_HABIT_FAILED:
         this.handleDeleteHabitFailed();
         break;
+      case ACTION_TYPE.UPDATE_PROGRESS_SUCCEEDED:
+        this.handleUpdateProgressSucceeded();
+        break;
+      case ACTION_TYPE.UPDATE_PROGRESS_FAILED:
+        this.handleUpdateProgressFailed();
+        break;
       default:
     }
   }
