@@ -11,6 +11,9 @@ from django.shortcuts import redirect  # Para redirigir en la vista home_view
 from django.utils import timezone  # Importar la zona horaria de Django
 from datetime import timedelta,datetime  # Importar timedelta para sumar o restar días a una fecha
 from django.utils.dateparse import parse_date
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.authentication import TokenAuthentication
+from rest_framework.permissions import AllowAny
 
 import secrets
 
@@ -36,7 +39,7 @@ class VerifyUserView(APIView):
         
         try:
             user = User.objects.get(email=email)
-            print(user)
+            
             
             if user.check_password(password):  # Verifica la contraseña
                 return Response({
@@ -51,9 +54,11 @@ class VerifyUserView(APIView):
             return Response({"exists 02": False}, status=status.HTTP_200_OK)
 
 class UserLoginView(APIView):
+    permission_classes = [AllowAny] 
     def post(self, request):
         email = request.data.get('email')
         password = request.data.get('password')
+        
         try:
             user = User.objects.get(email=email)
             if user.check_password(password):
@@ -100,11 +105,15 @@ class UserCreateView(APIView):
 
 # Vistas para el modelo Habit
 class HabitViewSet(viewsets.ModelViewSet):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
     queryset = Habit.objects.all()  # Esto debe devolver todos los hábitos
     serializer_class = HabitSerializer
 
 #Vistas para crear un Habit 
 class HabitCreateView(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
     def post(self, request):
         data = request.data
 
@@ -136,6 +145,8 @@ class HabitCreateView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
 class HabitEraseView(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
     def post(self, request):
         habit_id = request.data.get('habit_id')
         try:
@@ -148,6 +159,9 @@ class HabitEraseView(APIView):
 
 #Vistas para visualiar los habitos de un usuario
 class HabitUserID(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
     def get(self, request):
         # Obtener el user_id de los parámetros de la URL
         user_id = request.query_params.get('user_id')
@@ -166,12 +180,17 @@ class HabitUserID(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 # Vistas para el modelo Progress
 class ProgressViewSet(viewsets.ModelViewSet):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
     queryset = Progress.objects.all()
     serializer_class = ProgressSerializer
 
 
 #PROGRESO DE LOS HABITOS
 class ProgressHabitView(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
     def get(self, request):
 
         user_id = request.query_params.get('user_id')
@@ -243,6 +262,9 @@ class ProgressHabitView(APIView):
         return Response(progresos, status=status.HTTP_200_OK)
 
 class ProgressHabitViewByIDHabit(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
     def post(self, request):
         habito_id = request.data.get('habit_id')
     
@@ -304,6 +326,8 @@ class ProgressHabitViewByIDHabit(APIView):
 
 
 class ProgressAction(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
     def post(self, request):
         data = request.data
         serializer = ProgressSerializer(data=data)
@@ -313,6 +337,8 @@ class ProgressAction(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class ProgressUserDateView(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
     def get(self, request):
         # Obtener el user_id, habit_id, mes y año de los parámetros de la URL
         #user_id = request.query_params.get('user_id')
@@ -352,6 +378,8 @@ class ProgressUserDateView(APIView):
     
 
 class ProgressCurrentWeek(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
     def get(self, request):
         data = request.data
         # Obtener el user_id y habit_id de los parámetros de la URL
@@ -387,12 +415,16 @@ class ProgressCurrentWeek(APIView):
 
 # Vistas para el modelo Notification
 class NotificationViewSet(viewsets.ModelViewSet):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
     queryset = Notification.objects.all()
     serializer_class = NotificationSerializer
 
 #Vistas para ver notificaciones de un usuario
 
 class NotifyUserID(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
     def get(self, request):
         # Obtener el user_id de los parámetros de la URL
         user_id = request.query_params.get('user_id')
@@ -417,6 +449,8 @@ class NotifyUserID(APIView):
 
 
 class NotifyUserIDAll(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
     def get(self, request):
         
         user_id = request.query_params.get('user_id')
@@ -438,6 +472,8 @@ class NotifyUserIDAll(APIView):
     
 
 class NotifyChangeStatus(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
     def post(self, request):
         id = request.data.get('id')
         is_read = request.data.get('is_read')
@@ -458,6 +494,9 @@ class NotifyChangeStatus(APIView):
 
 # Vistas para el modelo Reward
 class RewardViewSet(viewsets.ModelViewSet):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
     queryset = Reward.objects.all()
     serializer_class = RewardSerializer
 
