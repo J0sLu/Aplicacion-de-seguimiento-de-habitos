@@ -1,7 +1,7 @@
 class HabitsService {
   async createHabit(name, frequency, category, target) {
     try {
-      const userId = localStorage.getItem("id");
+      const token = localStorage.getItem("token");
       const response = await fetch("http://localhost:8000/api/create_habit/", {
         method: "POST",
         headers: {
@@ -12,7 +12,7 @@ class HabitsService {
           frequency: frequency,
           category: category,
           target: target,
-          user: userId,
+          user: token,
         }),
       });
 
@@ -28,14 +28,17 @@ class HabitsService {
 
   async fetchHabits() {
     try {
-      const userId = localStorage.getItem("id");
+      const token = localStorage.getItem("token");
       const response = await fetch(
-        `http://localhost:8000/api/progress_habit/?=${userId}`,
+        `http://localhost:8000/api/progress_habit/`,
         {
-          method: "GET",
+          method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
+          body: JSON.stringify({
+            token: token,
+          }),
         }
       );
 

@@ -87,15 +87,25 @@ class HabitViewSet(viewsets.ModelViewSet):
 class HabitCreateView(APIView):
     def post(self, request):
         data = request.data
+
+        token = data.get('user')
+
+        try:
+            token_auth = Token.objects.get(token=token)
+            user_atuh = token_auth.id_user_id
+            user = User.objects.get(id=user_atuh)
+            print(user)
+        except Token.DoesNotExist:
+            return Response({"error": "Invalid token"}, status=status.HTTP_400_BAD_REQUEST)
         
-        habito = Habit.objects.filter(name=data.get('name'), user_id=data.get('user_id'))
+        habito = Habit.objects.filter(name=data.get('name'), user_id=user.id)
 
         if habito.exists():
             
             return Response({"error": "Habit already exists"}, status=status.HTTP_400_BAD_REQUEST)
 
         print(request.data.get('category'))
-        print(data)
+        
         
         if data.get('frequency') == "Diario":
             data['frequency'] = 'daily'
@@ -104,9 +114,10 @@ class HabitCreateView(APIView):
         elif data.get('frequency') == "Mensual":
             data['frequency'] = 'monthly'
 
-
+        data['user'] = user.id
         # Agregar la fecha actual al campo "start_date"
         data['start_date'] = datetime.now().date()
+        print(data)
         # Serializar los datos con la fecha actual agregada
         serializer = HabitSerializer(data=data)
         if serializer.is_valid():
@@ -152,10 +163,23 @@ class ProgressViewSet(viewsets.ModelViewSet):
 
 #PROGRESO DE LOS HABITOS
 class ProgressHabitView(APIView):
-    def get(self, request):
-
-        user_id = request.query_params.get('user_id')
+    def post(self, request):
         
+        
+        #token = request.query_params.get('token')
+        
+        token = request.data.get('token')
+        print(token)
+
+        if not token:
+            return Response({"error": "Token is required"}, status=status.HTTP_400_BAD_REQUEST)
+        
+        try:
+            token_auth = Token.objects.get(token=token)
+            user_id = token_auth.id_user_id
+        except Token.DoesNotExist:
+            return Response({"error": "Invalid token"}, status=status.HTTP_400_BAD_REQUEST)
+
         habitos = Habit.objects.filter(user_id=user_id)
         progresos = []  # Lista para almacenar los progresos de cada hábito
 
