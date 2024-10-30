@@ -10,6 +10,7 @@ import {
 } from "../actions/habits/HabitsActions";
 import habitsService from "../services/HabitsService";
 
+/* Clase para gestionar los hábitos */
 class HabitsActionCreator {
   async createHabit(name, frequency, category, target) {
     dispatcher.dispatch(CreateHabitAction);

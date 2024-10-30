@@ -3,6 +3,8 @@ from django.contrib.auth.hashers import make_password, check_password
 import uuid
 from django.utils import timezone
 from datetime import timedelta
+
+# Modelo de usuario con encriptación de contraseñas y verificación de contraseñas
 class User(models.Model):
     id = models.BigAutoField(primary_key=True)
     username = models.TextField()
@@ -23,7 +25,7 @@ class User(models.Model):
         # Verifica la contraseña proporcionada con el hash almacenado
         return check_password(raw_password, self.password)
     
-    
+# Modelo de hábito con relación a usuario y progreso de hábito
 class Habit(models.Model):
     FREQUENCY_CHOICES = [
         ('daily', 'Daily'),
@@ -47,7 +49,7 @@ class Habit(models.Model):
         # Verifica si el hábito ya existe
         super(Habit, self).save(*args, **kwargs)
 
-
+# Modelo de progreso de hábito con relación a hábito
 class Progress(models.Model):
     id = models.BigAutoField(primary_key=True)
     habit = models.ForeignKey(Habit, on_delete=models.CASCADE, related_name='progress')
@@ -58,7 +60,7 @@ class Progress(models.Model):
     def __str__(self):
         return f"Progress for {self.habit.name} on {self.date}"
 
-
+# Modelo de notificación con relación a usuario
 class Notification(models.Model):
     id = models.BigAutoField(primary_key=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='notifications')
@@ -70,7 +72,7 @@ class Notification(models.Model):
     def __str__(self):
         return self.message
 
-
+# Modelo de recompensa con relación a usuario
 class Reward(models.Model):
     id = models.BigAutoField(primary_key=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='rewards')
@@ -80,7 +82,7 @@ class Reward(models.Model):
     def __str__(self):
         return self.description
     
-
+# Modelo de token con relación a usuario
 class Token(models.Model):
     id = models.BigAutoField(primary_key=True)
     id_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='tokens', db_column='id_user')

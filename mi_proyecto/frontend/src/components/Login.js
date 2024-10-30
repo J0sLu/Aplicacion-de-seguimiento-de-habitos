@@ -3,20 +3,22 @@ import Form from "react-bootstrap/Form";
 import { Container } from "react-bootstrap";
 import Button from "react-bootstrap/Button";
 import { Navigate } from "react-router-dom";
-import Spinner from "react-bootstrap/Spinner";
-import Alert from "react-bootstrap/Alert";
-import { FaArrowLeft } from "react-icons/fa"; // Importa un ícono de flecha
+import Spinner from "react-bootstrap/Spinner"; 
+import Alert from "react-bootstrap/Alert"; 
+import { FaArrowLeft } from "react-icons/fa";
 
+/* Función que recibe las propiedades onLogin, onSignup y authStore, y retorna un componente de React */
 const Login = (props) => {
-  const { onLogin, onSignup, authStore } = props;
-  const [isLoggedIn, setIsLoggedIn] = useState(authStore.getIsLoggedIn());
-  const [isLoading, setIsLoading] = useState(authStore.getIsLoading());
-  const [showError, setShowError] = useState(authStore.getShowError());
-  const [username, setUsername] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [isLoggingIn, setIsLoggingIn] = useState(true);
+  const { onLogin, onSignup, authStore } = props; 
+  const [isLoggedIn, setIsLoggedIn] = useState(authStore.getIsLoggedIn()); // Estado para saber si el usuario está logueado
+  const [isLoading, setIsLoading] = useState(authStore.getIsLoading()); // Estado para saber si la página está cargando
+  const [showError, setShowError] = useState(authStore.getShowError()); // Estado para mostrar errores
+  const [username, setUsername] = useState(""); // Estado para el nombre de usuario
+  const [email, setEmail] = useState(""); // Estado para el correo electrónico
+  const [password, setPassword] = useState(""); // Estado para la contraseña
+  const [isLoggingIn, setIsLoggingIn] = useState(true); // Estado para saber si el usuario está logueando
 
+  /* Efecto que se ejecuta cuando el componente se monta */
   useEffect(() => {
     const handleChange = () => {
       setIsLoggedIn(authStore.getIsLoggedIn());
@@ -33,6 +35,7 @@ const Login = (props) => {
     };
   }, []);
 
+  /* Función que se ejecuta cuando se envía el formulario */
   const handleSubmit = (event) => {
     event.preventDefault();
     if (isLoggingIn) {

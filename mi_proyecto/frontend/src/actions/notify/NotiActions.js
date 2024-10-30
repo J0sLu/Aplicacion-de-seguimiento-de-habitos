@@ -1,5 +1,6 @@
 import { ACTION_TYPE } from "../../constants/AppConstants";
 
+/* Acciones de los recordatorios */
 export const CreateNotiAction = {
     type: ACTION_TYPE.CREATE_NOTI,
 };

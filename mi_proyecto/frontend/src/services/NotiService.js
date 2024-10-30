@@ -1,3 +1,4 @@
+// Clase para gestionar las notificaciones
 class NotiService {
     async createNotification(message, fecha, frecuencia) {
       try {

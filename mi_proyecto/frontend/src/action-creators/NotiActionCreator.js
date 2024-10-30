@@ -8,6 +8,8 @@ import {
 } from "../actions/notify/NotiActions";
 import notiService from "../services/NotiService";
 
+/* Clase para gestionar los recordatorios */
+
 class NotiActionCreator {
   async createNoti(message, fecha, frequency) {
       dispatcher.dispatch(CreateNotiAction);

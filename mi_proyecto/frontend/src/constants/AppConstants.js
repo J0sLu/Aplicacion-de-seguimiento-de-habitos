@@ -1,3 +1,4 @@
+/* Constantes de la aplicación */
 export const ACTION_TYPE = {
   LOGIN: "LOGIN",
   LOGIN_SUCCEEDED: "LOGIN_SUCCEEDED",
@@ -18,5 +19,5 @@ export const ACTION_TYPE = {
   CREATE_NOTI: "CREATE_NOTI",
   CREATE_NOTI_SUCCEEDED: "CREATE_NOTI_SUCCEEDED",
   CREATE_NOTI_FAILED: "CREATE_NOTI_FAILED",
-  
+
 };

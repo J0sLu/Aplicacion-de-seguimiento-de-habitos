@@ -1,5 +1,6 @@
 import { ACTION_TYPE } from "../../constants/AppConstants";
 
+/* Acciones de los hábitos */
 export const CreateHabitAction = {
   type: ACTION_TYPE.CREATE_HABIT,
 };

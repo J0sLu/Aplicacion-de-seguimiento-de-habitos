@@ -10,6 +10,7 @@ import {
 import dispatcher from "../dispatcher/Dispatcher";
 import authService from "../services/AuthService";
 
+/* Clase para gestionar la autenticación */
 class AuthActionCreator {
   async login(username, password) {
     dispatcher.dispatch(LoginAction);

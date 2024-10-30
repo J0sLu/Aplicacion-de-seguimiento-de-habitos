@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from .models import User, Habit, Progress, Notification, Reward
 
+# Serializadores para las entidades de la base de datos
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User

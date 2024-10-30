@@ -1,3 +1,5 @@
+
+/**Clase para gestionar los hábitos */
 class HabitsService {
   async createHabit(name, frequency, category, target) {
     try {

@@ -15,31 +15,32 @@ import Spinner from "react-bootstrap/Spinner";
 import notiStore from "../stores/NotiStore";
 import { format } from 'date-fns'; // Importa date-fns para formatear fechas
 
+/* Componente para el Dashboard */
 const Dashboard = () => {
-  const [habitName, setHabitName] = useState("");
-  const [frequency, setFrequency] = useState("Diario");
-  const [category, setCategory] = useState("Salud");
-  const [goal, setGoal] = useState("Diario");
-  const [reminderTime, setReminderTime] = useState("08:00");
-  const [notificationsEnabled, setNotificationsEnabled] = useState(true);
+  const [habitName, setHabitName] = useState(""); // Nuevo estado para el nombre del hábito
+  const [frequency, setFrequency] = useState("Diario"); // Nuevo estado para la frecuencia
+  const [category, setCategory] = useState("Salud"); // Nuevo estado para la categoría
+  const [goal, setGoal] = useState("Diario"); // Nuevo estado para el objetivo
+  const [reminderTime, setReminderTime] = useState("08:00");// Nuevo estado para la hora del recordatorio
+  const [notificationsEnabled, setNotificationsEnabled] = useState(true); // Nuevo estado para las notificaciones
   const [reminderMessage, setReminderMessage] = useState(""); // Nuevo estado para el mensaje
-  const [habits, setHabits] = useState([]);
-  const [notifications, setNotifications] = useState([]);
-  const [selectedHabit, setSelectedHabit] = useState("");
-  const [startDate, setStartDate] = useState("");
-  const [endDate, setEndDate] = useState("");
-  const [progressData, setProgressData] = useState([]);
+  const [habits, setHabits] = useState([]); // Nuevo estado para los hábitos
+  const [notifications, setNotifications] = useState([]); // Nuevo estado para las notificaciones
+  const [selectedHabit, setSelectedHabit] = useState("");// Nuevo estado para el hábito seleccionado
+  const [startDate, setStartDate] = useState(""); // Nuevo estado para la fecha de inicio
+  const [endDate, setEndDate] = useState(""); // Nuevo estado para la fecha de fin
+  const [progressData, setProgressData] = useState([]); //  Nuevo estado para los datos de progreso
 
 
 
-  const navigate = useNavigate(); // Hook para redirección
-  const [reminderFrequency, setReminderFrequency] = useState("Unica vez");
-  const [reminderDate, setReminderDate] = useState("");
+  const navigate = useNavigate(); // Hook para redirección 
+  const [reminderFrequency, setReminderFrequency] = useState("Unica vez"); // Nuevo estado para la frecuencia del recordatorio
+  const [reminderDate, setReminderDate] = useState(""); // Nuevo estado para la fecha del recordatorio
   const [isCreatingHabit, setIsCreatingHabit] = useState(
-    habitsStore.getIsCreating()
+    habitsStore.getIsCreating()// Nuevo estado para la creación de hábitos
   );
 
-  // Manejo de la creación de hábitos
+  /* Función para manejar la creación de hábitos */
   const handleHabitSubmit = (e) => {
     e.preventDefault();
     habitsActionCreator.createHabit(habitName, frequency, category, goal);
@@ -49,6 +50,7 @@ const Dashboard = () => {
     setGoal("");
   };
 
+  /* Función para procesar los datos de progreso */
   const processData = (data) => {
     if (!data || data.length === 0) {
       return []; // Devuelve un array vacío si no hay datos
@@ -72,7 +74,7 @@ const Dashboard = () => {
   };
   
 
-
+  /* Función para manejar la visualización del progreso */
   const handleViewProgress = async () => {
     const data = await habitsActionCreator.updateProgressGrafic(selectedHabit, startDate, endDate);
     const processedData = processData(data);
@@ -82,11 +84,11 @@ const Dashboard = () => {
   };
   
 
-
+  /* Función para manejar la eliminación de hábitos */
   const handleDeleteHabit = (id) => {
     habitsActionCreator.deleteHabit(id);
   };
-
+  /* Función para manejar el cambio de notificaciones */
   const handleChangeNoti = async (id) => {
     await notiActionCreator.changeNoti(id); // Llama al método para actualizar en el backend
   
@@ -97,11 +99,11 @@ const Dashboard = () => {
       )
     );
   };
-
+  /* Función para manejar la actualización de progreso */
   const handleUpdateProgress = (id) => {
     habitsActionCreator.updateProgress(id);
   };
-  
+  /* Función para manejar la creación de recordatorios */
   const handleReminderSubmit = (e) => {
     e.preventDefault();
   
@@ -130,7 +132,7 @@ const Dashboard = () => {
   };
   
 
-
+  /* Componente para el gráfico de progreso */
   const MyChart = ({ data }) => {
     const chartData = [
       [{ type: "date", label: "Fecha" }, { type: "number", label: "Veces Realizado" }],
@@ -158,7 +160,7 @@ const Dashboard = () => {
   };
 
 
-
+  /* Efecto para manejar las notificaciones */
   useEffect(() => {
     const interval = setInterval(() => {
       const currentTime = new Date().toLocaleTimeString("es-ES", {
@@ -196,14 +198,14 @@ const Dashboard = () => {
     return () => clearInterval(interval);
   }, [notifications, notificationsEnabled]);
 
-  // Manejo de cerrar sesión
+  /* Función para manejar el cierre de sesión */
   const handleLogout = () => {
     localStorage.removeItem("token"); // Borra el token del localStorage
     authActionCreator.logout();
     navigate("/login"); // Redirigir al login
   };
   
-
+  /* Efecto para manejar los cambios en el estado */
   useEffect(() => {
     // Escuchar cambios en el estado de autenticación
     const handleAuthChange = () => {
@@ -212,25 +214,26 @@ const Dashboard = () => {
       }
     };
 
+    /*  Efecto para manejar los cambios en los hábitos y notificaciones */
     const fetchHabits = async () => {
       setHabits(await habitsStore.fetchHabits());
     };
-
+    /* Efecto para manejar los cambios en las notificaciones */
     const fetchNotifications = async () => {
       const notiData = await notiStore.fetchNoti();
       // Asegúrate de que notifications siempre sea un array
       setNotifications(Array.isArray(notiData) ? notiData : notiData.notifications || []);
     };
-
+    /* Efecto para manejar los cambios en los hábitos */
     const handleHabitsChange = () => {
       setIsCreatingHabit(habitsStore.getIsCreating());
       fetchHabits();
     };
-
-    fetchHabits();
-    fetchNotifications();
-    authStore.addChangeListener(handleAuthChange);
-    habitsStore.addChangeListener(handleHabitsChange);
+    /* Efecto para manejar los cambios en las notificaciones */
+    fetchHabits(); // Llama a fetchHabits
+    fetchNotifications(); // Llama a fetchNotifications
+    authStore.addChangeListener(handleAuthChange); // Escucha los cambios en el estado de autenticación
+    habitsStore.addChangeListener(handleHabitsChange); // Escucha los cambios en los hábitos
     return () => {
       authStore.removeChangeListener(handleAuthChange);
       habitsStore.removeChangeListener(handleHabitsChange);
@@ -241,6 +244,7 @@ const Dashboard = () => {
   
   
   return (
+    /* Fragmento para el Dashboard */
     <>
       {/* Navbar con menú superior */}
       <Navbar bg="dark" variant="dark" expand="lg">

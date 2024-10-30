@@ -1,5 +1,6 @@
 import { ACTION_TYPE } from "../../constants/AppConstants";
 
+/* Acciones de login */
 export const LoginAction = {
   type: ACTION_TYPE.LOGIN,
 };

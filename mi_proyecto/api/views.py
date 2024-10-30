@@ -12,13 +12,8 @@ from django.utils import timezone  # Importar la zona horaria de Django
 from datetime import timedelta,datetime  # Importar timedelta para sumar o restar días a una fecha
 from django.utils.dateparse import parse_date
 
-""" 
-@api_view(['GET'])
-def example_view(request):
-    data = {"message": "Hello from Django!"}
-    return Response(data)
-"""
 
+# Vista de bienvenida
 class Home_view(APIView):
     def get(self, request):
         """ Muestra un mensaje de bienvenida"""
@@ -63,6 +58,7 @@ class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
 
+# Vista para crear un usuario
 class UserCreateView(APIView):
     def post(self, request):
         data = request.data
@@ -124,7 +120,8 @@ class HabitCreateView(APIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
+
+# Vista para eliminar un hábito 
 class HabitEraseView(APIView):
     def post(self, request):
         habit_id = request.data.get('habit_id')
@@ -244,6 +241,7 @@ class ProgressHabitView(APIView):
         
         return Response(progresos, status=status.HTTP_200_OK)
 
+#Vista para ver el progreso de un hábito por ID
 class ProgressHabitViewByIDHabit(APIView):
     def post(self, request):
         habito_id = request.data.get('habit_id')
@@ -303,7 +301,7 @@ class ProgressHabitViewByIDHabit(APIView):
             return Response({"error": "Habit not found"}, status=status.HTTP_404_NOT_FOUND)
 
 
-
+#Vista para crear un progreso
 class ProgressAction(APIView):
     def post(self, request):
         data = request.data
@@ -316,6 +314,7 @@ class ProgressAction(APIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+#Vista para ver los progresos de un usuario en un mes específico
 class ProgressUserDateView(APIView):
     def get(self, request):
         # Obtener el user_id, habit_id, mes y año de los parámetros de la URL
@@ -351,7 +350,7 @@ class ProgressUserDateView(APIView):
         
         return Response(serializer.data, status=status.HTTP_200_OK)
     
-
+#Vista para ver los progresos de un usuario en la semana actual
 class ProgressCurrentWeek(APIView):
     def get(self, request):
         data = request.data
@@ -459,7 +458,7 @@ class NotifyUserID(APIView):
         serializer = NotificationSerializer(notifications, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-
+#Vista para ver todas las notificaciones
 class NotifyUserIDAll(APIView):
     def get(self, request):
         
@@ -480,7 +479,7 @@ class NotifyUserIDAll(APIView):
         
         return Response(serializer.data, status=status.HTTP_200_OK)
     
-
+#  Vista para cambiar el estado de una notificación
 class NotifyChangeStatus(APIView):
     def post(self, request):
         id = request.data.get('id')
@@ -501,6 +500,7 @@ class NotifyChangeStatus(APIView):
      
             return Response({"message": "Notification status changed"}, status=status.HTTP_200_OK)
 
+#Vista para crear una notificación
 class NotifyCreateView(APIView):
     def post(self, request):
         data = request.data

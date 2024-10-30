@@ -1,3 +1,4 @@
+/* Clase para gestionar la autenticación */
 class AuthService {
   async login(email, password) {
     try {
