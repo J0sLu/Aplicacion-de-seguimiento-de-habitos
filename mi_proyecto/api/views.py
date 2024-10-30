@@ -433,10 +433,15 @@ class NotificationViewSet(viewsets.ModelViewSet):
 #Vistas para ver notificaciones de un usuario
 
 class NotifyUserID(APIView):
-    def get(self, request):
+    def post(self, request):
+        token = request.data.get('token')
         # Obtener el user_id de los parámetros de la URL
-        user_id = request.query_params.get('user_id')
+        token_auth = Token.objects.get(token=token)
+        if not token_auth:  
+            return Response({"error": "token is required"}, status=status.HTTP_400_BAD_REQUEST)
 
+        user_id = token_auth.id_user_id
+        print(user_id)
         if not user_id:
             return Response({"error": "user_id is required"}, status=status.HTTP_400_BAD_REQUEST)
     
@@ -448,11 +453,10 @@ class NotifyUserID(APIView):
 
         # Verificar si existen notificaciones
         if not notifications.exists():
-            return Response({"message": "No notifications found for this user"}, status=status.HTTP_404_NOT_FOUND)
+            return Response({"notifications": [], "message": "No notifications found for this user"}, status=status.HTTP_200_OK)
         
-        # Serializar las notificaciones
+        # Serializar las notificaciones y enviarlas como respuesta
         serializer = NotificationSerializer(notifications, many=True)
-        
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
@@ -480,10 +484,11 @@ class NotifyUserIDAll(APIView):
 class NotifyChangeStatus(APIView):
     def post(self, request):
         id = request.data.get('id')
-        is_read = request.data.get('is_read')
+        #is_read = request.data.get('is_read')
 
         noti = Notification.objects.get(id=id)
-        
+        is_read = noti.is_read
+        print(id)
         if not noti:
             return Response({"message": "Notification not found"}, status=status.HTTP_404_NOT_FOUND)
 
@@ -500,13 +505,19 @@ class NotifyCreateView(APIView):
     def post(self, request):
         data = request.data
         data["is_read"] = False
-
-        token = data.get('user_id')
+        
+        token = data.get('user')
         
         token_aut = Token.objects.get(token=token)
 
-    
+
+        data['date'] = data['message'].get('fecha')
+        data['frequency'] = data['message'].get('frequency')
+        data['message'] = data['message'].get('message')
+
+
         data['user'] = token_aut.id_user_id
+        print(data)
         serializer = NotificationSerializer(data=data)
         if serializer.is_valid():
             serializer.save()

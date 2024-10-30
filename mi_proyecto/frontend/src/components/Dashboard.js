@@ -6,11 +6,14 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import authActionCreator from "../action-creators/AuthActionCreator"; // Importar acciones de autenticación
 import habitsActionCreator from "../action-creators/HabitsActionCreator";
+import notiActionCreator from "../action-creators/NotiActionCreator";
 import authStore from "../stores/AuthStore";
 import habitsStore from "../stores/HabitStore";
 import ListGroup from "react-bootstrap/ListGroup";
 import ProgressBar from "react-bootstrap/ProgressBar";
 import Spinner from "react-bootstrap/Spinner";
+import notiStore from "../stores/NotiStore";
+import { format } from 'date-fns'; // Importa date-fns para formatear fechas
 
 const Dashboard = () => {
   const [habitName, setHabitName] = useState("");
@@ -84,32 +87,38 @@ const Dashboard = () => {
     habitsActionCreator.deleteHabit(id);
   };
 
+  const handleChangeNoti = async (id) => {
+    await notiActionCreator.changeNoti(id); // Llama al método para actualizar en el backend
+  
+    // Actualiza el estado de la notificación a leída
+    setNotifications((prevNotifications) =>
+      prevNotifications.map((notification) =>
+        notification.id === id ? { ...notification, is_read: true } : notification
+      )
+    );
+  };
+
   const handleUpdateProgress = (id) => {
     habitsActionCreator.updateProgress(id);
   };
   
-
-
-
   const handleReminderSubmit = (e) => {
     e.preventDefault();
-
-    const newNotification = {
-      message: `Recordatorio: ${reminderMessage}`,
-      time: reminderTime,
-      date: reminderDate,
-      frequency: reminderFrequency,
-      read: false,
-    };
-
-    
-
-    setNotifications((prevNotifications) => [
-      ...prevNotifications,
-      newNotification,
-    ]);
-
-    toast.success(`Recordatorio creado para las ${reminderTime}`, {
+  
+    // Obtén los datos necesarios del formulario
+    const message = reminderMessage;
+    const fecha = reminderDate + " " + reminderTime;
+    const frequency = reminderFrequency;
+  
+    // Llama a createNoti en NotiActionCreator
+    notiActionCreator.createNoti(message, fecha, frequency);
+  
+    // Resetea los campos del formulario después de crear la notificación
+    setReminderMessage("");
+    setReminderDate("");
+    setReminderFrequency("Unica vez");
+  
+    toast.success("Recordatorio creado con éxito", {
       position: "top-right",
       autoClose: 5000,
       hideProgressBar: false,
@@ -118,16 +127,9 @@ const Dashboard = () => {
       draggable: true,
       progress: undefined,
     });
-
-    // Limpiar campos de recordatorio
-    setReminderMessage("");
-    setReminderTime("08:00");
-    setReminderDate("");
-    setReminderFrequency("Unica vez");
-    
   };
-
   
+
 
   const MyChart = ({ data }) => {
     const chartData = [
@@ -154,6 +156,7 @@ const Dashboard = () => {
       />
     );
   };
+
 
 
   useEffect(() => {
@@ -211,13 +214,19 @@ const Dashboard = () => {
       setHabits(await habitsStore.fetchHabits());
     };
 
+    const fetchNotifications = async () => {
+      const notiData = await notiStore.fetchNoti();
+      // Asegúrate de que notifications siempre sea un array
+      setNotifications(Array.isArray(notiData) ? notiData : notiData.notifications || []);
+    };
+
     const handleHabitsChange = () => {
       setIsCreatingHabit(habitsStore.getIsCreating());
       fetchHabits();
     };
 
     fetchHabits();
-
+    fetchNotifications();
     authStore.addChangeListener(handleAuthChange);
     habitsStore.addChangeListener(handleHabitsChange);
     return () => {
@@ -245,15 +254,31 @@ const Dashboard = () => {
               <Dropdown.Toggle variant="success" id="dropdown-basic">
                 Notificaciones{" "}
                 <Badge bg="light" text="dark">
-                  {notifications.filter((notif) => !notif.read).length}
+                  {notifications.filter((notif) => !notif.is_read).length} {/* Solo cuenta las no leídas */}
                 </Badge>
               </Dropdown.Toggle>
               <Dropdown.Menu>
-                {notifications.map((notification, index) => (
-                  <Dropdown.Item key={index}>
-                    {notification.message}
-                  </Dropdown.Item>
-                ))}
+                {notifications.length > 0 ? (
+                  notifications.map((notification, index) => (
+                    <Dropdown.Item
+                      key={index}
+                      onClick={() => handleChangeNoti(notification.id)} // Llama a handleChangeNoti con el ID de la notificación
+                      style={{
+                        backgroundColor: notification.is_read ? "#ffffff" : "#d4edda",
+                        color: notification.is_read ? "#000" : "#155724"
+                      }}
+                    >
+                      <div>
+                        <strong>{notification.message}</strong>
+                      </div>
+                      <div style={{ fontSize: "0.85em", color: "#666" }}>
+                        {notification.sent_at ? format(new Date(notification.sent_at), 'dd/MM/yyyy HH:mm') : ''}
+                      </div>
+                    </Dropdown.Item>
+                  ))
+                ) : (
+                  <Dropdown.Item>No hay notificaciones</Dropdown.Item>
+                )}
               </Dropdown.Menu>
             </Dropdown>
             <Button
