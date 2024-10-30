@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import Chart from "chart.js/auto";
+import { Chart } from "react-google-charts"; 
 import { Navbar, Nav, Button, Dropdown, Badge } from "react-bootstrap";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -25,6 +25,7 @@ const Dashboard = () => {
   const [selectedHabit, setSelectedHabit] = useState("");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
+  const [progressData, setProgressData] = useState([]);
 
 
 
@@ -45,10 +46,38 @@ const Dashboard = () => {
     setGoal("");
   };
 
-
-  const handleViewProgress = () => {
-    habitsActionCreator.updateProgressGrafic(selectedHabit, startDate, endDate);
+  const processData = (data) => {
+    if (!data || data.length === 0) {
+      return []; // Devuelve un array vacío si no hay datos
+    }
+  
+    const dateCountMap = {};
+  
+    data.forEach(item => {
+      const date = item.date;
+      if (dateCountMap[date]) {
+        dateCountMap[date] += 1;
+      } else {
+        dateCountMap[date] = 1;
+      }
+    });
+  
+    return Object.entries(dateCountMap).map(([date, count]) => ({
+      date,
+      count,
+    }));
   };
+  
+
+
+  const handleViewProgress = async () => {
+    const data = await habitsActionCreator.updateProgressGrafic(selectedHabit, startDate, endDate);
+    const processedData = processData(data);
+    if (processedData.length > 0) {
+      setProgressData(processedData); // Solo actualiza si hay datos procesados
+    }
+  };
+  
 
 
   const handleDeleteHabit = (id) => {
@@ -58,6 +87,9 @@ const Dashboard = () => {
   const handleUpdateProgress = (id) => {
     habitsActionCreator.updateProgress(id);
   };
+  
+
+
 
   const handleReminderSubmit = (e) => {
     e.preventDefault();
@@ -69,6 +101,8 @@ const Dashboard = () => {
       frequency: reminderFrequency,
       read: false,
     };
+
+    
 
     setNotifications((prevNotifications) => [
       ...prevNotifications,
@@ -90,7 +124,37 @@ const Dashboard = () => {
     setReminderTime("08:00");
     setReminderDate("");
     setReminderFrequency("Unica vez");
+    
   };
+
+  
+
+  const MyChart = ({ data }) => {
+    const chartData = [
+      [{ type: "date", label: "Fecha" }, { type: "number", label: "Veces Realizado" }],
+      ...data.map(item => [new Date(item.date), item.count]), // Usa count como Y
+    ];
+    const options = {
+      title: "Progreso de Hábito",
+      hAxis: { title: "Fecha" },
+      vAxis: { title: "Progreso" },
+      legend: "none",
+      lineWidth: 2,
+      pointSize: 5,
+      curveType: "function",
+    };
+
+    return (
+      <Chart
+        chartType="LineChart"
+        data={chartData}
+        options={options}
+        width="100%"
+        height="400px"
+      />
+    );
+  };
+
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -163,53 +227,7 @@ const Dashboard = () => {
   }, [navigate]);
 
   // gráfico de progreso de hábitos
-  useEffect(() => {
-    const ctx = document.getElementById("habitProgressChart").getContext("2d");
   
-    // Suponemos que `progressData` contiene los datos con las fechas de progreso
-    // Ejemplo: [{ date: "2024-10-01", progress: 1 }, { date: "2024-10-05", progress: 1 }]
-    const progressData = [
-      { date: "2024-10-01", progress: 1 },
-      { date: "2024-10-05", progress: 1 },
-      { date: "2024-10-07", progress: 1 },
-    ];
-  
-    // Extrae las fechas y marca el progreso como `1` para cada fecha en que se completó el hábito
-    const labels = progressData.map((entry) => {
-      const date = new Date(entry.date);
-      return `${date.getDate()}/${date.getMonth() + 1}`; // Formato "día/mes"
-    });
-    const data = progressData.map((entry) => entry.progress);
-  
-    new Chart(ctx, {
-      type: "scatter",
-      data: {
-        labels: labels,
-        datasets: [
-          {
-            label: "Días de Progreso",
-            data: data,
-            borderColor: "rgba(75, 192, 192, 1)",
-            backgroundColor: "rgba(75, 192, 192, 0.6)",
-            pointRadius: 5,
-            showLine: false, // No mostrar líneas entre los puntos
-          },
-        ],
-      },
-      options: {
-        responsive: true,
-        scales: {
-          x: {
-            type: 'category',
-            labels: labels, // Mostrar fechas como etiquetas en el eje X
-          },
-          y: {
-            display: false, // Ocultar el eje Y si solo deseas ver los puntos
-          },
-        },
-      },
-    });
-  }, []);
   
   return (
     <>
@@ -489,23 +507,17 @@ const Dashboard = () => {
         </div>
 
         {/* Visualización del progreso */}
-      <div>
+        <div>
       <h2>Progreso de Hábitos</h2>
 
-      {/* Selección de hábito y fechas */}
       <div style={{ display: "flex", justifyContent: "center", marginBottom: "15px" }}>
         <select
           onChange={(e) => setSelectedHabit(e.target.value)}
-          style={{
-            padding: "10px",
-            borderRadius: "5px",
-            border: "1px solid #ddd",
-            marginRight: "10px",
-          }}
           value={selectedHabit}
+          style={{ padding: "10px", borderRadius: "5px", marginRight: "10px" }}
         >
           <option value="">Selecciona un Hábito</option>
-          {habits.map((habit) => (
+          {habits.map(habit => (
             <option key={habit.habit_id} value={habit.habit_id}>
               {habit.name}
             </option>
@@ -515,28 +527,20 @@ const Dashboard = () => {
         <input
           type="date"
           onChange={(e) => setStartDate(e.target.value)}
-          style={{
-            padding: "10px",
-            borderRadius: "5px",
-            border: "1px solid #ddd",
-            marginRight: "10px",
-          }}
           value={startDate}
+          style={{ padding: "10px", borderRadius: "5px", marginRight: "10px" }}
         />
 
         <input
           type="date"
           onChange={(e) => setEndDate(e.target.value)}
-          style={{
-            padding: "10px",
-            borderRadius: "5px",
-            border: "1px solid #ddd",
-          }}
           value={endDate}
+          style={{ padding: "10px", borderRadius: "5px" }}
         />
       </div>
 
       <button
+        onClick={handleViewProgress}
         style={{
           padding: "10px 20px",
           backgroundColor: "#3A5474",
@@ -547,13 +551,12 @@ const Dashboard = () => {
           fontSize: "1rem",
           marginBottom: "15px",
         }}
-        onClick={handleViewProgress}
       >
         Ver Progreso
       </button>
 
-      <canvas id="habitProgressChart" style={{ maxWidth: "100%", height: "auto" }}></canvas>
-  </div>
+      <MyChart data={progressData} />
+    </div>
 
 
         {/* Recordatorios y notificaciones */}

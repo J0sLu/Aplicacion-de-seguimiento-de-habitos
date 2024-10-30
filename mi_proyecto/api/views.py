@@ -94,7 +94,7 @@ class HabitCreateView(APIView):
             token_auth = Token.objects.get(token=token)
             user_atuh = token_auth.id_user_id
             user = User.objects.get(id=user_atuh)
-            print(user)
+           
         except Token.DoesNotExist:
             return Response({"error": "Invalid token"}, status=status.HTTP_400_BAD_REQUEST)
         
@@ -104,7 +104,6 @@ class HabitCreateView(APIView):
             
             return Response({"error": "Habit already exists"}, status=status.HTTP_400_BAD_REQUEST)
 
-        print(request.data.get('category'))
         
         
         if data.get('frequency') == "Diario":
@@ -117,7 +116,7 @@ class HabitCreateView(APIView):
         data['user'] = user.id
         # Agregar la fecha actual al campo "start_date"
         data['start_date'] = datetime.now().date()
-        print(data)
+        
         # Serializar los datos con la fecha actual agregada
         serializer = HabitSerializer(data=data)
         if serializer.is_valid():
@@ -169,8 +168,7 @@ class ProgressHabitView(APIView):
         #token = request.query_params.get('token')
         
         token = request.data.get('token')
-        print(token)
-
+        
         if not token:
             return Response({"error": "Token is required"}, status=status.HTTP_400_BAD_REQUEST)
         
@@ -258,8 +256,7 @@ class ProgressHabitViewByIDHabit(APIView):
             habito = Habit.objects.get(id=habito_id)
             frecuencia = habito.frequency  # Ej. "mes", "semana", "diario"
             target = habito.target
-            print (frecuencia)
-            print (target)
+
 
             # Fecha de hoy para referencia
             today = datetime.today()
@@ -292,7 +289,7 @@ class ProgressHabitViewByIDHabit(APIView):
 
             # Sumar el progreso registrado (ajustar a `progress` o el nombre correcto)
             progreso_total = progresos.count()
-            print(progreso_total)
+
             # Calcular el progreso en escala de 0 a 1
             progreso_escala =  round(min(progreso_total / target, 1.0), 2) if target else 0
 
@@ -327,9 +324,6 @@ class ProgressUserDateView(APIView):
         year = data.get('year')
         month = data.get('month')
         habit_id = data.get('habit_id')
-        print(year)
-        print(month)
-        print(habit_id)
 
         if  not year or not month or not habit_id:
             return Response({"error": "habit_id, year and month are required"}, status=status.HTTP_400_BAD_REQUEST)
@@ -400,9 +394,7 @@ class ProgressDateRangeView(APIView):
         start_date = data.get('start_date')
         end_date = data.get('end_date')
         
-        print(habit_id)
-        print(start_date)
-        print(end_date)
+
 
         # Validar los parámetros obligatorios
         if not habit_id:
@@ -430,7 +422,7 @@ class ProgressDateRangeView(APIView):
         
         # Serializar los progresos
         serializer = SimpleProgressSerializer(progress, many=True)
-        print(serializer.data)
+
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 # Vistas para el modelo Notification
@@ -450,7 +442,7 @@ class NotifyUserID(APIView):
     
         # Obtener la fecha y hora actuales
         current_time = timezone.now() - timedelta(hours=6)
-        print(current_time)
+        
         # Filtrar notificaciones por user_id y por sent_at <= current_time
         notifications = Notification.objects.filter(user_id=user_id, sent_at__lte=current_time)
 
@@ -491,7 +483,7 @@ class NotifyChangeStatus(APIView):
         is_read = request.data.get('is_read')
 
         noti = Notification.objects.get(id=id)
-        #print(noti.is_read)
+        
         if not noti:
             return Response({"message": "Notification not found"}, status=status.HTTP_404_NOT_FOUND)
 
@@ -501,7 +493,7 @@ class NotifyChangeStatus(APIView):
             noti.is_read = True
             noti.save()
             noti = Notification.objects.get(id=id)
-            print(noti.is_read)
+     
             return Response({"message": "Notification status changed"}, status=status.HTTP_200_OK)
 
 class NotifyCreateView(APIView):
