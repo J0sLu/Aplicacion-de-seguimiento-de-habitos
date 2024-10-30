@@ -25,3 +25,8 @@ class RewardSerializer(serializers.ModelSerializer):
     class Meta:
         model = Reward
         fields = '__all__'  # Puedes especificar los campos si lo prefieres
+
+class SimpleProgressSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Progress
+        fields = ['date', 'progress']  # Incluye solo los campos necesarios

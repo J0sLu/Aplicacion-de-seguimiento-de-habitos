@@ -90,7 +90,41 @@ class HabitsService {
       return null;
     }
   }
+
+  async fetchProgressData(habitId, startDate, endDate) {
+    try {
+      //const token = localStorage.getItem("token");
+      const response = await fetch(
+        `http://localhost:8000/api/progress_date/`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            habit_id: habitId,
+            start_date: startDate,
+            end_date: endDate,
+          }),
+        }
+      );
+  
+      if (response.ok) {
+        const data = await response.json();
+        return data; // Retorna los datos sin llamar a setProgressData
+      } else {
+        throw new Error("Error al obtener los datos de progreso");
+      }
+    } catch (e) {
+      console.error(e);
+      return null;
+    }
+  }
+
 }
+
+
+
 
 const habitsService = new HabitsService();
 

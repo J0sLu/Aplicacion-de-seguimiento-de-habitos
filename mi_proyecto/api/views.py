@@ -4,7 +4,7 @@ from rest_framework.views import APIView
 from rest_framework import viewsets
 from rest_framework import status
 from .models import User, Habit, Progress, Notification, Reward, Token
-from .serializers import UserSerializer, HabitSerializer, ProgressSerializer, NotificationSerializer, RewardSerializer
+from .serializers import *
 from django.contrib.auth.hashers import make_password
 from django.http import HttpResponse
 from django.shortcuts import redirect  # Para redirigir en la vista home_view
@@ -392,11 +392,17 @@ class ProgressCurrentWeek(APIView):
 
 #Vista para ver los progresos de un usuario en un rango de fechas
 class ProgressDateRangeView(APIView):
-    def get(self, request):
+    def post(self, request):
         # Obtener habit_id, start_date y end_date de los parámetros de la URL
-        habit_id = request.query_params.get('habit_id')
-        start_date = request.query_params.get('start_date')
-        end_date = request.query_params.get('end_date')
+        data = request.data
+
+        habit_id = data.get('habit_id')
+        start_date = data.get('start_date')
+        end_date = data.get('end_date')
+        
+        print(habit_id)
+        print(start_date)
+        print(end_date)
 
         # Validar los parámetros obligatorios
         if not habit_id:
@@ -423,8 +429,8 @@ class ProgressDateRangeView(APIView):
             return Response({"message": "No progress found for this habit in the specified date range"}, status=status.HTTP_404_NOT_FOUND)
         
         # Serializar los progresos
-        serializer = ProgressSerializer(progress, many=True)
-        
+        serializer = SimpleProgressSerializer(progress, many=True)
+        print(serializer.data)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 # Vistas para el modelo Notification
@@ -501,6 +507,14 @@ class NotifyChangeStatus(APIView):
 class NotifyCreateView(APIView):
     def post(self, request):
         data = request.data
+        data["is_read"] = False
+
+        token = data.get('user_id')
+        
+        token_aut = Token.objects.get(token=token)
+
+    
+        data['user'] = token_aut.id_user_id
         serializer = NotificationSerializer(data=data)
         if serializer.is_valid():
             serializer.save()

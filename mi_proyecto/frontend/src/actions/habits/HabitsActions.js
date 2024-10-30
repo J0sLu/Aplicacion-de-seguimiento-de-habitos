@@ -27,3 +27,12 @@ export const UpdateProgressSucceededAction = {
 export const UpdateProgressFailedAction = {
   type: ACTION_TYPE.UPDATE_PROGRESS_FAILED,
 };
+
+
+export const UpdateProgressGraficSucceededAction = {
+  type: ACTION_TYPE.UPDATE_PROGRESS_GRAFIC_SUCCEEDED,
+};
+
+export const UpdateProgressGraficFailedAction = {
+  type: ACTION_TYPE.UPDATE_PROGRESS_GRAFIC_FAILED,
+};

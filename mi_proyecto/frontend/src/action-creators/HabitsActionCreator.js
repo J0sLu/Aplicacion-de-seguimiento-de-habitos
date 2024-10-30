@@ -45,6 +45,22 @@ class HabitsActionCreator {
       dispatcher.dispatch(UpdateProgressFailedAction);
     }
   }
+
+  async updateProgressGrafic(id,startDate,endDate) {
+    const didUpdate = await habitsService.fetchProgressData(id,startDate,endDate);
+    console.log("HACIENDO UPDATE PROGRESS GRAF");
+    console.log(id);
+    console.log(startDate);
+    console.log(endDate);
+    console.log(didUpdate);
+    if (didUpdate) {
+      dispatcher.dispatch(UpdateProgressSucceededAction);
+    } else {
+      dispatcher.dispatch(UpdateProgressFailedAction);
+    }
+  }
+
+
 }
 
 const habitsActionCreator = new HabitsActionCreator();
