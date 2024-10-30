@@ -5,6 +5,7 @@ import Button from "react-bootstrap/Button";
 import { Navigate } from "react-router-dom";
 import Spinner from "react-bootstrap/Spinner";
 import Alert from "react-bootstrap/Alert";
+import { FaArrowLeft } from "react-icons/fa"; // Importa un ícono de flecha
 
 const Login = (props) => {
   const { onLogin, onSignup, authStore } = props;
@@ -70,6 +71,23 @@ const Login = (props) => {
         className="rounded"
         onSubmit={handleSubmit}
       >
+        {/* Botón de regreso, solo visible en la vista de registro */}
+        {!isLoggingIn && (
+          <Button
+            variant="link"
+            style={{
+              alignSelf: "flex-start",
+              marginBottom: "10px",
+              fontSize: "1.2rem",
+              color: "#3A5474",
+              textDecoration: "none",
+            }}
+            onClick={() => setIsLoggingIn(true)}
+          >
+            <FaArrowLeft style={{ marginRight: "5px" }} /> Volver a Iniciar Sesión
+          </Button>
+        )}
+
         <h1 style={{ marginBottom: "30px" }}>
           {isLoggingIn ? "Inicia Sesión" : "Registro de Usuario"}
         </h1>
@@ -77,7 +95,7 @@ const Login = (props) => {
           <Alert variant="danger" style={{ width: "100%" }}>
             {isLoggingIn
               ? "Error: Credenciales incorrectas, intenta de nuevo."
-              : "Error: Algo salio mal, intenta de nuevo"}
+              : "Error: Algo salió mal, intenta de nuevo"}
           </Alert>
         )}
 
@@ -127,11 +145,9 @@ const Login = (props) => {
         </Container>
         <Button
           className="fs-5"
-          //variant="warning"
           style={{
             width: "100%",
             color: "white",
-            //backgroundColor: !isLoggingIn ? "#433878" : null,
             backgroundColor: "#3A5474",
             marginTop: "10px",
           }}
@@ -172,7 +188,7 @@ const Login = (props) => {
               className="fs-5"
               onClick={() => setIsLoggingIn(false)}
             >
-              Registrate aquí
+              Regístrate aquí
             </Button>
           </Container>
         )}

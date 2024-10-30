@@ -265,7 +265,7 @@ const Dashboard = () => {
                       onClick={() => handleChangeNoti(notification.id)} // Llama a handleChangeNoti con el ID de la notificación
                       style={{
                         backgroundColor: notification.is_read ? "#ffffff" : "#d4edda",
-                        color: notification.is_read ? "#000" : "#155724"
+                        color: notification.is_read ? "#000" : "#FCE79A"
                       }}
                     >
                       <div>
