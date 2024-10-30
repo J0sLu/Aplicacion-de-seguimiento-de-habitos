@@ -198,9 +198,11 @@ const Dashboard = () => {
 
   // Manejo de cerrar sesión
   const handleLogout = () => {
+    localStorage.removeItem("token"); // Borra el token del localStorage
     authActionCreator.logout();
     navigate("/login"); // Redirigir al login
   };
+  
 
   useEffect(() => {
     // Escuchar cambios en el estado de autenticación
